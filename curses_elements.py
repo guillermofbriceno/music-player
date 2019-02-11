@@ -4,11 +4,22 @@ import sys,os
 import curses
 import datetime
 import time
-from subprocess import call
-import subprocess
 
 class Track_Pane:
     def __init__(self, global_height, global_width, pane_height, pane_width, ypos, xpos, startscroll, stdscr):
+        """Initializes a track pane.
+        
+        Args:
+            global_height (int): The window height
+            global_width (int): The window width
+            pane_height (int): Desired pane height
+            pane_width (int): Desired pane width
+            ypos (int): Desired y position
+            xpos (int): Desired x position
+            startscroll (int): Threshold for when the list begins to scroll
+            stdcr (curses window): Standard curses window
+
+        """
         self.global_width = global_width
         self.global_height = global_height
         self.pane_width = pane_width
