@@ -38,6 +38,20 @@ def get_unique_attributes(dict_list, attr):
             if attr in x 
             if not (x[attr] in seen or seen_add(x[attr]))]
 
+def get_tracks_with(self, dict_list, attrkey, attrvalue):
+        """Return list of tracks with specified attributes.
+        Args:
+            attrkey (str): The attribute key or type.
+            attrvalue (list): The attribute(s) being matched for.
+
+        Returns:
+            list: List of track dictionaries."""
+
+        return [track for track in dict_list 
+                if attrkey in track.keys() 
+                if any(val in track[attrkey] for val in attrvalue)]
+
+
 def start_database(directory_str):
     database_name = directory_str[directory_str.rfind("/") + 1:] + "-db"
     if database_file_already_exists(database_name):

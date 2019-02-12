@@ -140,6 +140,9 @@ class Track_Pane:
 
         self.stdscr.attroff(curses.color_pair(5))
 
+    def is_track_pane():
+        return True
+
 class List_Pane:
     def __init__(self, global_height, global_width, pane_height, pane_width, ypos, xpos, startscroll, stdscr, title):
         self.global_width = global_width
@@ -243,4 +246,7 @@ class List_Pane:
         self.stdscr.addstr(self.ypos, self.xpos + 4, self.title)
 
         self.stdscr.attroff(curses.color_pair(5))
+
+    def is_track_pane():
+        return True
 
