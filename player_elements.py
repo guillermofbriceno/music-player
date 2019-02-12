@@ -109,7 +109,15 @@ class Tab:
             self.panes[self.current_pane].deactivate()
             self.current_pane += 1
             self.panes[self.current_pane].activate()
-    
+
     def refresh_panes(self):
         for pane in self.panes:
             pane.refresh()
+
+    def clear_panes(sefl):
+        for pane in self.panes:
+            pane.clear()
+
+    def search_mode(self):
+        while (k != enter):
+            pass

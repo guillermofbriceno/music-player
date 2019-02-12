@@ -7,6 +7,12 @@ import time
 import subprocess
 from subprocess import call
 
+def status_bar(string, stdscr, ypos, width):
+    stdscr.attron(curses.color_pair(5))
+    stdscr.addstr(ypos - 1, 0, string)
+    stdscr.addstr(ypos - 1, len(string), " " * (width - len(string) - 1))
+    stdscr.attroff(curses.color_pair(5))
+
 class Track_Pane:
     def __init__(self, global_height, global_width, pane_height, pane_width, ypos, xpos, startscroll, stdscr):
         """Initializes a track pane.
