@@ -127,14 +127,16 @@ class Database:
 
         Returns:
             list: List of track dictionaries."""
-
-        return [track for track in self.dict_list 
+        if not attrkey == None:
+            return [track for track in self.dict_list 
                 if attrkey in track.keys() 
                 if any(val in track[attrkey] for val in attrvalue)]
+        else:
+            return self.dict_list
 
-database_test = start_database("/home/guillermo/programming/music-player/test-music")
-
-database_test.sort_tracks("NORMAL")
-filteredtracks = database_test.dict_list
-for track in filteredtracks:
-    print(track["TRACKNUMBER"], track["TITLE"])
+#database_test = start_database("/home/guillermo/programming/music-player/test-music")
+#
+#database_test.sort_tracks("NORMAL")
+#filteredtracks = database_test.dict_list
+#for track in filteredtracks:
+#    print(track["TRACKNUMBER"], track["TITLE"])

@@ -9,7 +9,7 @@ player_config  = {
         }
 
 class Tab:
-    def __init__(self, config_type, config_attr, stdscr):
+    def __init__(self, config_type, config_attr, stdscr, database):
         self.panes = []
         self.stdscr = stdscr
         self.isActive = False
@@ -17,11 +17,12 @@ class Tab:
         self.attr_values = [] #List of genres, List of albums, List of performers, "EMPTY"
         self.filtered_tracks = []
         self.current_pane = 1
+        self.database = database
 
         if config_type == "SINGLE":
-            create_single_pane(config_attr)
+            self.create_single_pane(config_attr)
         elif config_type == "4-PANE":
-            create_4_pane(config_attr)
+            self.create_4_pane(config_attr)
         elif config_type == "2-PANE":
             raise NotImplementedError("Config type " + config_type + " not implemented")
         else:
@@ -32,13 +33,13 @@ class Tab:
     
     def create_single_pane(self, config_attr):
         window_height, window_width, track_filter_key, track_filter_value = config_attr
-        self.filtered_tracks = database.get_tracks_with(track_filter_key, track_filter_value)
+        self.filtered_tracks = self.database.get_all_tracks_with(track_filter_key, track_filter_value)
         self.attr_keys.append("TRACK")
         self.attr_values.append("Empty")
         pane = Track_Pane(window_height, window_width, window_height - 1, window_width, 0, 0, player_config["SCROLL-START"], self.stdscr)
         pane.refresh()
         pane.activate()
-        self.panes.append(tab)
+        self.panes.append(pane)
 
     def render_all_panes(self, full_render=False):
         #full_render must be run at least once
@@ -91,7 +92,10 @@ class Tab:
 
     def move_down(self):
         for pane, l in zip(self.panes, self.attr_values):
-            pane.move_down_one(len(l))
+            if not pane.is_track_pane():
+                pane.move_down_one(len(l))
+            else:
+                pane.move_down_one(len(self.filtered_tracks))
 
     def move_left(self):
         if not self.current_pane == 1:
@@ -105,3 +109,7 @@ class Tab:
             self.panes[self.current_pane].deactivate()
             self.current_pane += 1
             self.panes[self.current_pane].activate()
+    
+    def refresh_panes(self):
+        for pane in self.panes:
+            pane.refresh()

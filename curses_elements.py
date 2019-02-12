@@ -4,6 +4,8 @@ import sys,os
 import curses
 import datetime
 import time
+import subprocess
+from subprocess import call
 
 class Track_Pane:
     def __init__(self, global_height, global_width, pane_height, pane_width, ypos, xpos, startscroll, stdscr):
@@ -39,7 +41,11 @@ class Track_Pane:
         self.pane.refresh()
 
     def render(self, track_dicts):
-        empty_dict = {" ":" "} #in order to not render bottom row track, causing borders
+        empty_dict = {  "TITLE":" ",
+                        "PATH": " ",
+                        "TRACKNUMBER": " ",
+                        "LENGTH": " "
+        } #in order to not render bottom row track, causing borders
         track_dicts.append(empty_dict)
         i = 0
         self.pane.erase()
@@ -150,7 +156,7 @@ class Track_Pane:
 
         self.stdscr.attroff(curses.color_pair(5))
 
-    def is_track_pane():
+    def is_track_pane(self):
         return True
 
 class List_Pane:
@@ -257,6 +263,6 @@ class List_Pane:
 
         self.stdscr.attroff(curses.color_pair(5))
 
-    def is_track_pane():
-        return True
+    def is_track_pane(self):
+        return False
 
