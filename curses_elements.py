@@ -202,7 +202,7 @@ class List_Pane:
 
         for string in string_list:
             string = str(string_list[i + self.scrolloffset])
-            
+
             if len(string) + 2 >= self.pane_width:
                 string = string[:-(len(string) - self.pane_width + 4)]
                 string = string + ".."

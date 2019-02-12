@@ -120,4 +120,4 @@ class Tab:
 
     def search_mode(self):
         while (k != enter):
-            pass
+            

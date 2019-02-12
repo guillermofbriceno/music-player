@@ -24,10 +24,10 @@ def normal_sort(l):
 
 
 def get_unique_attributes(dict_list, attr):
-    """Return uniqified list of attributes matching attr.
+    """Return uniqified list of attributes/keys matching attr.
     Args:
         dict_list (list of dicts): The list of dictionaries to be searched.
-        attr (str): Attribute being matched for.
+        attr (str): Attribute/key being matched for.
 
     Returns:
         list: List of string attribute values."""
@@ -66,9 +66,18 @@ def start_database(directory_str):
         return database
 
 def database_file_already_exists(file_name):
+    """Check if database file exists in the running/database directory.
+    Args:
+        file_name (str): The name of the file in the running directory.
+    Returns:
+        bool: Whether or not the file was found"""
     return os.path.isfile(os.getcwd() + "/" + file_name)
 
 class Database:
+    """A representation of the entire music library.
+    Args:
+        directory_str (str): The directory of the music folder.
+    """
     def __init__(self, directory_str):
         self.dict_list = []
         self.directory_str = directory_str
@@ -90,7 +99,7 @@ class Database:
             #Add length and path to the track dictionary. Absolute path cut MPC prep
             tmp_tagdict["PATH"] = str(path)[len(directory_str) + 1:]
             tmp_tagdict["LENGTH"] = track.length
-            
+
             #Handle weird tracknumber cases for sorting methods
             tracknum_tmp = tmp_tagdict["TRACKNUMBER"]
             if '/' in tracknum_tmp:
@@ -115,10 +124,15 @@ class Database:
             raise ValueError("Sorting method '" + method + "' invalid")
 
     def get_track(self, path):
+        """Get a single track dict matching a path. Might be useless.
+        Args:
+            path (str): Path of track.
+        Returns:
+            dict: Track dict."""
         for track in self.dict_list:
             if path in track["PATH"]:
                 return track
-    
+
     def get_all_tracks_with(self, attrkey, attrvalue):
         """Return list of tracks with specified attributes.
         Args:
@@ -133,10 +147,3 @@ class Database:
                 if any(val in track[attrkey] for val in attrvalue)]
         else:
             return self.dict_list
-
-#database_test = start_database("/home/guillermo/programming/music-player/test-music")
-#
-#database_test.sort_tracks("NORMAL")
-#filteredtracks = database_test.dict_list
-#for track in filteredtracks:
-#    print(track["TRACKNUMBER"], track["TITLE"])
