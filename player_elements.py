@@ -14,16 +14,16 @@ class Tab:
         self.stdscr = stdscr
         self.isActive = False
         self.attr_keys = [] #GENRE, ALBUM, PERFORMER, TRACKS
-        self.attr_values = [] #"Cantatas", "BWV 1", "English Baroque Soloists"
+        self.attr_values = [] #List of genres, List of albums, List of performers, "EMPTY"
         self.filtered_tracks = []
+        self.current_pane = 1
 
         if config_type == "SINGLE":
             create_single_pane(config_attr)
-            #set filtered tracks to something
         elif config_type == "4-PANE":
             create_4_pane(config_attr)
         elif config_type == "2-PANE":
-            pass
+            raise NotImplementedError("Config type " + config_type + " not implemented")
         else:
             raise ValueError("Invalid config type")
 
@@ -31,7 +31,10 @@ class Tab:
         pass
     
     def create_single_pane(self, config_attr):
-        window_height, window_widthstd = config_attr
+        window_height, window_width, track_filter_key, track_filter_value = config_attr
+        self.filtered_tracks = database.get_tracks_with(track_filter_key, track_filter_value)
+        self.attr_keys.append("TRACK")
+        self.attr_values.append("Empty")
         pane = Track_Pane(window_height, window_width, window_height - 1, window_width, 0, 0, player_config["SCROLL-START"], self.stdscr)
         pane.refresh()
         pane.activate()
@@ -55,8 +58,6 @@ class Tab:
             else:
                 pane.render(lst)
         
-                    
-
         """
         Non-looped code for 4-pane
 
@@ -78,14 +79,29 @@ class Tab:
         track_pane.render(self.filtered_tracks)
         """
         
+    def activate_tab(self):
+        self.isActive = True
+
+    def deactivate_tab(self):
+        self.isActive = False
+
     def move_up(self):
-        pass
+        for pane in self.panes:
+            pane.move_up_one()
 
     def move_down(self):
-        pass
+        for pane, l in zip(self.panes, self.attr_values):
+            pane.move_down_one(len(l))
 
     def move_left(self):
-        pass
+        if not self.current_pane == 1:
+            self.panes[self.current_pane].deactivate()
+            self.panes[self.current_pane].stop_showing_position()
+            self.current_pane -= 1
+            self.panes[self.current_pane].activate()
 
     def move_right(self):
-        pass
+        if not self.current_pane == len(self.panes):
+            self.panes[self.current_pane].deactivate()
+            self.current_pane += 1
+            self.panes[self.current_pane].activate()

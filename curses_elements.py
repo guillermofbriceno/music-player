@@ -28,6 +28,7 @@ class Track_Pane:
         self.xpos = xpos
         self.ypos = ypos
         self.isActive = False
+        self.can_show_position = False
         self.stdscr = stdscr
         self.trackpos = 0
         self.vertpos = 0
@@ -37,13 +38,13 @@ class Track_Pane:
         self.pane = curses.newwin(pane_height, pane_width, ypos, xpos)
         self.pane.refresh()
 
-    def render(self, tracklist):
-        empty_list = [" ", " ", " ", " ", " ", " "] #in order to not render bottom row track, causing borders
-        tracklist.append(empty_list)
+    def render(self, track_dicts):
+        empty_dict = {" ":" "} #in order to not render bottom row track, causing borders
+        track_dicts.append(empty_dict)
         i = 0
         self.pane.erase()
 
-        if (self.vertpos == (self.pane_height - self.startscroll)) and (self.trackpos < (len(tracklist) - (self.startscroll - 2))):
+        if (self.vertpos == (self.pane_height - self.startscroll)) and (self.trackpos < (len(track_dicts) - (self.startscroll - 2))):
             self.scrolloffset += 1
             self.vertpos -= 1
 
@@ -51,17 +52,19 @@ class Track_Pane:
             self.scrolloffset -= 1
             self.vertpos += 1
 
-        for track in tracklist:
-            title = str(tracklist[i + self.scrolloffset][0])
-            trackpath = str(tracklist[i + self.scrolloffset][1])
+        for track in track_dicts:
+            title = track_dicts[i + self.scrolloffset]["TITLE"]
+            trackpath = track_dicts[i + self.scrolloffset]["PATH"]
+            tracknum = track_dicts[i + self.scrolloffset]["TRACKNUMBER"]
+            tracklength = track_dicts[i + self.scrolloffset]["LENGTH"]
+
             trackIsNowPlaying = trackpath in self.current_playing_path
 
-            if (i + self.scrolloffset) != (len(tracklist) - 1):
-                tracktime = str(datetime.timedelta(seconds=int(tracklist[i + self.scrolloffset][4])))
+            if (i + self.scrolloffset) != (len(track_dicts) - 1):
+                tracktime = str(datetime.timedelta(seconds=int(tracklength)))
             else:
                 tracktime = " "
 
-            tracknum = str(tracklist[i + self.scrolloffset][3])
             space = (4 - len(tracknum)) * " "    
             title = tracknum + space + title
 
@@ -69,7 +72,7 @@ class Track_Pane:
                 title = title[:-(len(title) - self.pane_width + 11)]
                 title += ".."
 
-            if self.vertpos == i and self.isActive:
+            if self.vertpos == i and self.can_show_position:
                 self.pane.attron(curses.color_pair(3))
                 self.pane.addstr(i + 1, len(title), " " * (self.pane_width - len(title) - 8) + tracktime)
             else:
@@ -88,15 +91,22 @@ class Track_Pane:
             if i == self.pane_height - 2:
                 break
 
-        tracklist.pop()
+        track_dicts.pop()
        
         self.render_borders()
         
     def activate(self):
         self.isActive = True
+        self.can_show_position = True
     
-    def disactivate(self):
+    def deactivate(self):
         self.isActive = False
+
+    def keep_showing_position(self):
+        self.can_show_position = True
+
+    def stop_showing_position(self):
+        self.can_show_position = False
 
     def clear(self):
         self.vertpos = 0
@@ -203,7 +213,7 @@ class List_Pane:
     def activate(self):
         self.isActive = True
     
-    def disactivate(self):
+    def deactivate(self):
         self.isActive = False
 
     def clear(self):
