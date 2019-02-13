@@ -38,9 +38,10 @@ def get_unique_attributes(dict_list, attr):
             if attr in x 
             if not (x[attr] in seen or seen_add(x[attr]))]
 
-def get_tracks_with(self, dict_list, attrkey, attrvalue):
+def get_tracks_with(dict_list, attrkey, attrvalue):
         """Return list of tracks with specified attributes.
         Args:
+            dict_list (list): List of track dictionaries.
             attrkey (str): The attribute key or type.
             attrvalue (list): The attribute(s) being matched for.
 

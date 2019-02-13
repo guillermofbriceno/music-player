@@ -174,6 +174,7 @@ class List_Pane:
         self.startscroll = startscroll
         self.xpos = xpos
         self.ypos = ypos
+        self.can_show_position = False
         self.isActive = False
         self.stdscr = stdscr
         self.title = title
@@ -206,7 +207,7 @@ class List_Pane:
             if len(string) + 2 >= self.pane_width:
                 string = string[:-(len(string) - self.pane_width + 4)]
                 string = string + ".."
-            if self.vertpos == i and self.isActive:
+            if self.vertpos == i and self.can_show_position:
                 self.pane.attron(curses.color_pair(3))
                 self.pane.addstr(i + 1, len(string), " " * (self.pane_width - len(string) - 1))
             else:
@@ -224,9 +225,16 @@ class List_Pane:
 
     def activate(self):
         self.isActive = True
+        self.can_show_position = True
     
     def deactivate(self):
         self.isActive = False
+
+    def keep_showing_position(self):
+        self.can_show_position = True
+
+    def stop_showing_position(self):
+        self.can_show_position = False
 
     def clear(self):
         self.vertpos = 0
