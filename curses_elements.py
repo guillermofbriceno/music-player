@@ -41,6 +41,7 @@ class Track_Pane:
         self.trackpos = 0
         self.vertpos = 0
         self.scrolloffset = 0
+        self.current_playing_path = ""
 
         #create window
         self.pane = curses.newwin(pane_height, pane_width, ypos, xpos)

@@ -60,14 +60,6 @@ class Tab:
         self.refresh_panes()
         self.populate_lists()
 
-        f = open('debug-log', 'w')
-        for lst in self.attr_values:
-            for string in lst:
-                f.write(string)
-                f.write("\n")
-
-        f.close()
-
     def create_single_pane(self, config_attr):
         window_height, window_width, self.main_filter = config_attr
         self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1])
@@ -79,6 +71,7 @@ class Tab:
         self.panes.append(pane)
 
     def populate_lists(self):
+        #this func must be run at least once in the beginning
         self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1])
         attr_values_tmp = []
         for key, pane in zip(self.attr_keys, self.panes):
@@ -90,70 +83,55 @@ class Tab:
         self.attr_values = attr_values_tmp
 
     def render_all_panes(self, full_render=False):
-        #full_render must be run at least once
-        if full_render:
-            self.populate_lists()
+        if self.isActive:
+            if full_render:
+                self.populate_lists()
 
-        for pane, lst in zip(self.panes, self.attr_values):
-            if pane.is_track_pane():
-                pane.render(self.filtered_tracks)
-            else:
-                pane.render(lst)
-        
-        """
-        Non-looped code for 4-pane
-
-        run once, out of this method:
-        filtered_tracks = database.get_all_tracks_with("COMPOSER", ["BACH"])
-
-        ONLY on a movement keypress:
-        self.genre_list = get_unique_attributes(filtered_tracks, "GENRE")
-        self.filtered_tracks = get_tracks_with(filtered_tracks, "GENRE", genre_list[genre_pane.selectedpos])
-        self.album_list = get_unique_attributes(filtered_tracks, "ALBUM")
-        self.filtered_tracks = get_tracks_with(filtered_tracks, "ALBUM", album_list[album_pane.selectedpos])
-        self.performer_list = get_unique_attributes(filtered_tracks, "PERFORMER")
-        self.filtered_tracks = get_tracks_with(filtered_tracks, "PERFORM", performer_list[performer_pane.selected_pos])
-       
-        on a movement keypress AND normal render (for current playing track)
-        genre_pane.render(self.genre_list)
-        album_pane.render(self.album_list)
-        performer_pane.render(self.performer_list)
-        track_pane.render(self.filtered_tracks)
-        """
-        
+            for pane, lst in zip(self.panes, self.attr_values):
+                if pane.is_track_pane():
+                    pane.render(self.filtered_tracks)
+                else:
+                    pane.render(lst)
+               
     def activate_tab(self):
+        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1])
         self.isActive = True
 
     def deactivate_tab(self):
         self.isActive = False
+        del self.filtered_tracks
 
     def move_up(self):
-        for pane in self.panes:
-            pane.move_up_one()
+        if self.isActive:
+            for pane in self.panes:
+                pane.move_up_one()
 
     def move_down(self):
-        for pane, l in zip(self.panes, self.attr_values):
-            if not pane.is_track_pane():
-                pane.move_down_one(len(l))
-            else:
-                pane.move_down_one(len(self.filtered_tracks))
+        if self.isActive:
+            for pane, l in zip(self.panes, self.attr_values):
+                if not pane.is_track_pane():
+                    pane.move_down_one(len(l))
+                else:
+                    pane.move_down_one(len(self.filtered_tracks))
 
     def move_left(self):
-        if not self.current_pane == 0:
+        if not self.current_pane == 0 and self.isActive:
             self.panes[self.current_pane].deactivate()
             self.panes[self.current_pane].stop_showing_position()
+            self.panes[self.current_pane].clear()
             self.current_pane -= 1
             self.panes[self.current_pane].activate()
 
     def move_right(self):
-        if not self.current_pane == len(self.panes) - 1:
+        if not self.current_pane == len(self.panes) - 1 and self.isActive:
             self.panes[self.current_pane].deactivate()
             self.current_pane += 1
             self.panes[self.current_pane].activate()
 
     def refresh_panes(self):
-        for pane in self.panes:
-            pane.refresh()
+        if self.isActive:
+            for pane in self.panes:
+                pane.refresh()
 
     def clear_panes(sefl):
         for pane in self.panes:
