@@ -24,7 +24,7 @@ def start_player(stdscr):
     database = start_database(db_dir)
 
     tabs = []
-    for tabconf in tab_configs:
+    for tabconf in tabs_config:
         config_attr = [height, width, 
                 tabconf['tab-filter'], tabconf.get('filter-keys'), tabconf.get('pane-titles')]
         tmp_tab = Tab(tabconf['tab-type'], config_attr, stdscr, database)

@@ -31,17 +31,16 @@ ui_config = {
 #genre_tab = Tab("4-PANE", config_attr, stdscr, database)
 
 tabs_config = [
-        tab1 = {
-            'tab-type': "SINGLE",
-            'tab-filter': ["COMPOSER", ["BACH"]]
+            {
+                'tab-type': "SINGLE",
+                'tab-filter': ["COMPOSER", ["Bach"]]
+            },
+            {
+                'tab-type': "4-PANE",
+                'tab-filter': [None, None],
+                'filter-keys': ["GENRE", "ALBUM", "PERFORMER", "TRACK"],
+                'pane-titles': ["Genre", "Work", "Performer", None]
             }
-        tab2 = {
-            'tab-type': "4-PANE",
-            'tab-filter': [None, None]
-            'filter-keys': ["GENRE", "ALBUM", "PERFORMER", "TRACK"],
-            'pane-titles': ["Genre", "Work", "Performer", None]
-            }
-
         ]
 
 

@@ -58,7 +58,7 @@ class Tab:
         self.populate_lists()
 
     def create_single_pane(self, config_attr):
-        window_height, window_width, self.main_filter = [x for x in config_attr if x not None]
+        window_height, window_width, self.main_filter = [x for x in config_attr if x is not None]
         self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0],
                 self.main_filter[1])
         self.attr_keys.append("TRACK")
