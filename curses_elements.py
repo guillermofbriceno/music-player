@@ -180,7 +180,7 @@ class List_Pane:
         self.stdscr = stdscr
         self.title = title
         
-        self.selectedpos = 0
+        self.selectedpos = None
         self.vertpos = 0
         self.scrolloffset = 0
 
@@ -226,8 +226,10 @@ class List_Pane:
 
     def activate(self):
         self.isActive = True
+        if not self.can_show_position:
+            self.selectedpos = 0
         self.can_show_position = True
-    
+            
     def deactivate(self):
         self.isActive = False
 
@@ -239,7 +241,7 @@ class List_Pane:
 
     def clear(self):
         self.vertpos = 0
-        self.selectedpos = 0
+        self.selectedpos = None
         self.scrolloffset = 0
 
     def refresh(self):
@@ -251,12 +253,12 @@ class List_Pane:
         self.global_width = width
 
     def move_down_one(self, listlength):
-        if (self.selectedpos < listlength - 1) and self.isActive:
+        if self.isActive and (self.selectedpos < listlength - 1):
             self.vertpos += 1
             self.selectedpos += 1
 
     def move_up_one(self):
-        if (self.selectedpos != 0) and self.isActive:
+        if self.isActive and (self.selectedpos != 0):
             self.vertpos -= 1
             self.selectedpos -= 1
 

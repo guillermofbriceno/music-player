@@ -12,24 +12,16 @@ from operator import methodcaller
 from database import *
 from player_elements import *
 from curses_elements import *
+from config import *
 
 def start_player(stdscr):
     stdscr.clear()
     stdscr.refresh()
-    curses.curs_set(False)
-    stdscr.nodelay(0)
-
-    curses.start_color()
-    curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
-    curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
-    curses.init_pair(3, curses.COLOR_BLACK, 124)
-    curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_WHITE)
-    curses.init_pair(5, curses.COLOR_BLACK, 124)
-    curses.init_pair(6, 124, curses.COLOR_BLACK)
+    
+    load_curses_config(stdscr)
 
     height, width = stdscr.getmaxyx()
-
-    database = start_database("/home/guillermo/bach/Music/Bach/FLAC")
+    database = start_database(db_dir)
 
     tab_filter = ["COMPOSER", ["Bach"]]
     config_attr = [height, width, tab_filter]
@@ -43,17 +35,7 @@ def start_player(stdscr):
     
     tabs = [alltracks_tab, genre_tab]
     tabs[0].activate_tab()
-    for tab in tabs:
-        tab.refresh_panes()
-
-    number_keys = [ord(str(num)) for num in range(9)]
-    mvmt_keys = {
-            ord('j'): 'move_down',
-            ord('k'): 'move_up',
-            ord('h'): 'move_left',
-            ord('l'): 'move_right',
-            ord('n'): 'play_track'
-            }
+    member_func('refresh_panes', tabs)
 
     k = 100
     current_tab = 0

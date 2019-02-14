@@ -28,4 +28,7 @@ def load_curses_config(stdscr):
     curses.init_pair(5, curses.COLOR_BLACK, 124)
     curses.init_pair(6, 124, curses.COLOR_BLACK)
 
+
+############
+#Don't touch
 mvmt_keys = {ord(k): v for k, v in mvmt_keys.items()}

@@ -75,10 +75,14 @@ class Tab:
         self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1])
         attr_values_tmp = []
         for key, pane in zip(self.attr_keys, self.panes):
-            if not key == "TRACK":
+            if not key == "TRACK" and not pane.selectedpos == None:
                 tmp_list = get_unique_attributes(self.filtered_tracks, key)
                 attr_values_tmp.append(tmp_list)
                 self.filtered_tracks = get_tracks_with(self.filtered_tracks, key, [tmp_list[pane.selectedpos]])
+            if not key == "TRACK" and pane.selectedpos == None:
+                tmp_list = get_unique_attributes(self.filtered_tracks, key)
+                attr_values_tmp.append(tmp_list)
+
         attr_values_tmp.append("Empty") #insert empty string in last entry for tracks in next loop
         self.attr_values = attr_values_tmp
 
@@ -143,10 +147,16 @@ class Tab:
 
     def play_track(self):
         if self.isActive:
-            if self.panes[self.current_pane].is_track_pane():
-                subprocess.call(["mpc", "clear"], stdout=subprocess.PIPE)
-                subprocess.call(["mpc", "add", 
-                    self.filtered_tracks[self.panes[self.current_pane].trackpos]["PATH"]], 
-                    stdout=subprocess.PIPE)
-                subprocess.call(["mpc", "play",], stdout=subprocess.PIPE)
+            subprocess.call(["mpc", "clear"], stdout=subprocess.PIPE)
+
+            for track in self.filtered_tracks:
+                subprocess.call(["mpc", "add", track["PATH"]], stdout=subprocess.PIPE)
+
+            subprocess.call(["mpc", "play", 
+                str(self.panes[len(self.panes) - 1].trackpos + 1)], stdout=subprocess.PIPE)
+
+            #subprocess.call(["mpc", "add", 
+            #    self.filtered_tracks[self.panes[self.current_pane].trackpos]["PATH"]], 
+            #    stdout=subprocess.PIPE)
+            #subprocess.call(["mpc", "play"], stdout=subprocess.PIPE)
                 
