@@ -7,6 +7,7 @@ import taglib
 from subprocess import call
 import subprocess
 import time
+from operator import methodcaller
 
 from database import *
 from player_elements import *
@@ -36,9 +37,7 @@ def start_player(stdscr):
     
     tab_filter = ["COMPOSER", ["Bach"]]
     filter_keys = ["GENRE", "ALBUM", "PERFORMER", "TRACK"]
-    #filter_keys = ["PERFORMER", "GENRE", "ALBUM", "TRACK"]
     pane_titles = ["Genre", "Work", "Performer", None]
-    #pane_titles = ["Performer", "Genre", "Album", "Track"]
     config_attr = [height, width, tab_filter, filter_keys, pane_titles]
     genre_tab = Tab("4-PANE", config_attr, stdscr, database)
     
@@ -48,27 +47,26 @@ def start_player(stdscr):
         tab.refresh_panes()
 
     number_keys = [ord(str(num)) for num in range(9)]
+    mvmt_keys = {
+            ord('j'): 'move_down',
+            ord('k'): 'move_up',
+            ord('h'): 'move_left',
+            ord('l'): 'move_right',
+            ord('n'): 'play_track'
+            }
+
     k = 100
     current_tab = 0
 
     while(k != ord('q')):
-        if k == ord('j'):
-            for tab in tabs:
-                tab.move_down()
-        elif k == ord('k'):
-            for tab in tabs:
-                tab.move_up()
-        elif k == ord('l'):
-            for tab in tabs:
-                tab.move_right()
-        elif k == ord('h'):
-            for tab in tabs:
-                tab.move_left()
+        if k in mvmt_keys:
+            member_func(mvmt_keys[k], tabs)
         elif k in number_keys:
             tabs[current_tab].deactivate_tab()
             current_tab = int(chr(k)) - 1
             tabs[current_tab].activate_tab()
             stdscr.erase()
+
         for tab in tabs:
             tab.render_all_panes(True)
             tab.refresh_panes()
@@ -76,6 +74,11 @@ def start_player(stdscr):
         status_bar("Testing", stdscr, height, width)
 
         k = stdscr.getch()
+
+def member_func(f, obj_list):
+    for obj in obj_list:
+        func = methodcaller(f)
+        func(obj)
 
 def main():
     curses.wrapper(start_player)

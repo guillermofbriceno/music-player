@@ -140,3 +140,13 @@ class Tab:
     def search_mode(self):
         while (k != enter):
             pass
+
+    def play_track(self):
+        if self.isActive:
+            if self.panes[self.current_pane].is_track_pane():
+                subprocess.call(["mpc", "clear"], stdout=subprocess.PIPE)
+                subprocess.call(["mpc", "add", 
+                    self.filtered_tracks[self.panes[self.current_pane].trackpos]["PATH"]], 
+                    stdout=subprocess.PIPE)
+                subprocess.call(["mpc", "play",], stdout=subprocess.PIPE)
+                
