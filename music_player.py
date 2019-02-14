@@ -17,23 +17,19 @@ from config import *
 def start_player(stdscr):
     stdscr.clear()
     stdscr.refresh()
-    
+
     load_curses_config(stdscr)
 
     height, width = stdscr.getmaxyx()
     database = start_database(db_dir)
 
-    tab_filter = ["COMPOSER", ["Bach"]]
-    config_attr = [height, width, tab_filter]
-    alltracks_tab = Tab("SINGLE", config_attr, stdscr, database)
-    
-    tab_filter = ["COMPOSER", ["Bach"]]
-    filter_keys = ["GENRE", "ALBUM", "PERFORMER", "TRACK"]
-    pane_titles = ["Genre", "Work", "Performer", None]
-    config_attr = [height, width, tab_filter, filter_keys, pane_titles]
-    genre_tab = Tab("4-PANE", config_attr, stdscr, database)
-    
-    tabs = [alltracks_tab, genre_tab]
+    tabs = []
+    for tabconf in tab_configs:
+        config_attr = [height, width, 
+                tabconf['tab-filter'], tabconf.get('filter-keys'), tabconf.get('pane-titles')]
+        tmp_tab = Tab(tabconf['tab-type'], config_attr, stdscr, database)
+        tabs.append(tmp_tab)
+
     tabs[0].activate_tab()
     member_func('refresh_panes', tabs)
 

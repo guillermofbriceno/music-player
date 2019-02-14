@@ -3,11 +3,7 @@
 import sys,os
 from curses_elements import *
 from database import *
-
-player_config  = {
-        "MUSIC-DIR": "/home/guillermo/programming/music-player/test-music",
-        "SCROLL-START": 8
-        }
+from config import *
 
 class Tab:
     def __init__(self, config_type, config_attr, stdscr, database):
@@ -21,6 +17,7 @@ class Tab:
         self.main_filter = [] #Main filter for the tab
         self.current_pane = 0
         self.database = database
+        self.scrll_start = ui_config['SCRLL-TH']
 
         if config_type == "SINGLE":
             self.create_single_pane(config_attr)
@@ -38,22 +35,22 @@ class Tab:
         pane1 = List_Pane(window_height, window_width, #main window dims
                 window_height - 1, 30, #height and width of pane
                 0, 0, #y and x position of top left corner of pane
-                player_config["SCROLL-START"], self.stdscr, self.pane_titles[0])
+                self.scrll_start, self.stdscr, self.pane_titles[0])
 
         pane2 = List_Pane(window_height, window_width, 
                 window_height - 1, 60, 
                 0, 29, 
-                player_config["SCROLL-START"], self.stdscr, self.pane_titles[1])
+                self.scrll_start, self.stdscr, self.pane_titles[1])
 
         pane3 = List_Pane(window_height, window_width, 
                 9, window_width - 88, 
                 0, 88, 
-                player_config["SCROLL-START"], self.stdscr, self.pane_titles[2])
+                self.scrll_start, self.stdscr, self.pane_titles[2])
 
         pane4 = Track_Pane(window_height, window_width, 
                 window_height - 9, window_width - 88, 
                 8, 88, 
-                player_config["SCROLL-START"], self.stdscr)
+                self.scrll_start, self.stdscr)
 
         pane1.activate()
         self.panes = [pane1, pane2, pane3, pane4]
@@ -61,11 +58,12 @@ class Tab:
         self.populate_lists()
 
     def create_single_pane(self, config_attr):
-        window_height, window_width, self.main_filter = config_attr
-        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1])
+        window_height, window_width, self.main_filter = [x for x in config_attr if x not None]
+        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0],
+                self.main_filter[1])
         self.attr_keys.append("TRACK")
         self.attr_values.append("Empty")
-        pane = Track_Pane(window_height, window_width, window_height - 1, window_width, 0, 0, player_config["SCROLL-START"], self.stdscr)
+        pane = Track_Pane(window_height, window_width, window_height - 1, window_width, 0, 0, self.scrll_start, self.stdscr)
         pane.refresh()
         pane.activate()
         self.panes.append(pane)
@@ -154,9 +152,3 @@ class Tab:
 
             subprocess.call(["mpc", "play", 
                 str(self.panes[len(self.panes) - 1].trackpos + 1)], stdout=subprocess.PIPE)
-
-            #subprocess.call(["mpc", "add", 
-            #    self.filtered_tracks[self.panes[self.current_pane].trackpos]["PATH"]], 
-            #    stdout=subprocess.PIPE)
-            #subprocess.call(["mpc", "play"], stdout=subprocess.PIPE)
-                
