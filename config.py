@@ -2,7 +2,7 @@
 import curses
 
 #Database directory
-db_dir = "/home/guillermo/bach/Music/Bach/FLAC"
+db_dir = ["/home/guillermo/programming/music-player/test-music", "/home/guillermo/bach/Files/Torrents/Music/Jazz"]
 
 #Keybindings
 number_keys = [ord(str(num)) for num in range(9)]
@@ -19,7 +19,7 @@ mvmt_keys = {
 
 #Interface configuration
 ui_config = {
-            'SCRLL-TH': 8
+            'SCRLL-TH': 8,
             'refresh-delay': 15
             }
 

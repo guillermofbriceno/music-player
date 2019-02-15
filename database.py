@@ -3,6 +3,7 @@ from pathlib import Path
 import taglib
 import pickle
 from fractions import Fraction
+from functools import reduce
 import re
 
 def tryint(s):
@@ -53,15 +54,15 @@ def get_tracks_with(dict_list, attrkey, attrvalue):
                 if any(val in track[attrkey] for val in attrvalue)]
 
 
-def start_database(directory_str):
-    database_name = directory_str[directory_str.rfind("/") + 1:] + "-db"
+def start_database(directory_strs):
+    database_name = directory_strs[0][directory_strs[0].rfind("/") + 1:] + "-db"
     if database_file_already_exists(database_name):
         db_file = open(database_name, 'rb')
         database = pickle.load(db_file)
         return database
     else:
         print("Database file not found, creating one...")
-        database = Database(directory_str)
+        database = Database(directory_strs)
         db_file = open(database_name, 'wb')
         pickle.dump(database, db_file)
         return database
@@ -79,38 +80,41 @@ class Database:
     Args:
         directory_str (str): The directory of the music folder.
     """
-    def __init__(self, directory_str):
+    def __init__(self, directory_strs):
         self.dict_list = []
-        self.directory_str = directory_str
-        self.generate_database(directory_str)
+        self.directory_strs = directory_strs
+        self.generate_database(directory_strs)
         self.sort_tracks("NORMAL")
 
-    def generate_database(self, directory_str):
+    def generate_database(self, directory_strs):
         mask = r'**/*.[mf][pl][3a]*'
-        pathlist = Path(directory_str).glob(mask)
-
+        
         print("Generating database...\n")
 
-        for path in pathlist:
-            track = taglib.File(path)
+        for dir_str in directory_strs:
+            pathlist_gen = Path(dir_str).glob(mask)
+            for path in pathlist_gen:
 
-            #Read the dict from taglib by removing the brackets from the values
-            tmp_tagdict = {k: self.cut_brackets(tag) for k, tag in track.tags.items()}
+                track = taglib.File(path)
 
-            #Add length and path to the track dictionary. Absolute path cut MPC prep
-            tmp_tagdict["PATH"] = str(path)[len(directory_str) + 1:]
-            tmp_tagdict["LENGTH"] = track.length
+                #Read the dict from taglib by removing the brackets from the values
+                tmp_tagdict = {k: self.cut_brackets(tag) for k, tag in track.tags.items()}
 
-            #Handle weird tracknumber cases for sorting methods
-            tracknum_tmp = tmp_tagdict["TRACKNUMBER"]
-            if '/' in tracknum_tmp:
-                tmp_tagdict["TRACKNUMBER"] = tracknum_tmp[:-tracknum_tmp.rfind("/") - 1]
-            elif tracknum_tmp.isdigit():
-                pass
-            else:
-                tmp_tagdict["TRACKNUMBER"] = "0"
+                #Add length and path to the track dictionary. Absolute path cut MPC prep
+                tmp_tagdict["PATH"] = str(path)[len(dir_str) + 1:]
 
-            self.dict_list.append(tmp_tagdict)
+                tmp_tagdict["LENGTH"] = track.length
+
+                #Handle weird tracknumber cases for sorting methods
+                tracknum_tmp = tmp_tagdict["TRACKNUMBER"]
+                if '/' in tracknum_tmp:
+                    tmp_tagdict["TRACKNUMBER"] = tracknum_tmp[:-tracknum_tmp.rfind("/") - 1]
+                elif tracknum_tmp.isdigit():
+                    pass
+                else:
+                    tmp_tagdict["TRACKNUMBER"] = "0"
+
+                self.dict_list.append(tmp_tagdict)
 
     def cut_brackets(self, tag):
         string = str(tag)
