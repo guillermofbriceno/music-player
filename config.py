@@ -12,7 +12,8 @@ mvmt_keys = {
             'k': 'move_up',
             'h': 'move_left',
             'l': 'move_right',
-            'n': 'play_track'
+            'n': 'play_track',
+            't': 'jump_to_track_pane'
             }
 
 #Interface configuration
@@ -42,7 +43,15 @@ tabs_config = [
                 'exclude': [None, None],
                 'filter-keys': ["GENRE", "ALBUM", "PERFORMER", "TRACK"],
                 'pane-titles': ["Genre", "Work", "Performer", None]
+            },
+            {
+                'tab-type': "3-PANE",
+                'include-only': [None, None],
+                'exclude': [None, None],
+                'filter-keys': ["PERFORMER", "ALBUM", "TRACK"],
+                'pane-titles': ["Performer", "Work", None]
             }
+
         ]
 
 

@@ -37,6 +37,8 @@ class Tab:
             self.create_single_pane(config_attr)
         elif config_type == "4-PANE":
             self.create_4_pane(config_attr)
+        elif config_type == "3-PANE":
+            self.create_3_pane(config_attr)
         elif config_type == "2-PANE":
             raise NotImplementedError("Config type " + config_type + " not implemented")
         else:
@@ -71,6 +73,32 @@ class Tab:
         pane1.activate()
         self.panes = [pane1, pane2, pane3, pane4]
         self.refresh_panes()
+
+    def create_3_pane(self, config_attr):
+        window_height, window_width, self.main_filter, self.exclude_filter, self.attr_keys, self.pane_titles = config_attr
+
+        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1],
+                self.exclude_filter[0], self.exclude_filter[1])
+
+        pane1 = List_Pane(window_height, window_width, #main window dims
+                window_height - 1, 30, #height and width of pane
+                0, 0, #y and x position of top left corner of pane
+                self.scrll_start, self.stdscr, self.pane_titles[0])
+
+        pane2 = List_Pane(window_height, window_width, 
+                window_height - 1, 60, 
+                0, 29, 
+                self.scrll_start, self.stdscr, self.pane_titles[1])
+
+        pane3 = Track_Pane(window_height, window_width, 
+                window_height - 1, window_width - 88, 
+                0, 88, 
+                self.scrll_start, self.stdscr)
+
+        pane1.activate()
+        self.panes = [pane1, pane2, pane3]
+        self.refresh_panes()
+        self.populate_lists()
         self.populate_lists()
 
     def create_single_pane(self, config_attr):
@@ -148,6 +176,12 @@ class Tab:
             self.panes[self.current_pane].deactivate()
             self.current_pane += 1
             self.panes[self.current_pane].activate()
+    
+    def jump_to_track_pane(self):
+        if self.isActive:
+            self.panes[self.current_pane].deactivate()
+            self.current_pane = len(self.panes) - 1
+            self.panes[len(self.panes) - 1].activate()
 
     def refresh_panes(self):
         if self.isActive:

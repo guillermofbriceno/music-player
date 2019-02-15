@@ -151,6 +151,10 @@ class Track_Pane:
             self.pane.border(0,0,0,0,curses.ACS_LTEE,curses.ACS_RTEE,curses.ACS_BTEE,0)
         elif self.ypos == 0 and self.xpos == 0:
             self.pane.border(0,0,0,0,0,0,0,0)
+        elif self.ypos == 0 and self.xpos > 0:
+            self.stdscr.addstr(self.ypos, self.xpos, "┬", curses.color_pair(2))
+            self.pane.border(0,0,0,0,curses.ACS_LTEE,0,curses.ACS_BTEE,0)
+
 
         self.stdscr.refresh()
         self.stdscr.attron(curses.color_pair(6))
