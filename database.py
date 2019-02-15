@@ -149,29 +149,35 @@ class Database:
         Returns:
             list: List of track dictionaries."""
 
-        #This code is very ugly. Find way to make it better.
-        if attrkey == None and exattrkey == None:
+        #This code is very ugly. Find way to make it better.b
+
+        #If no filter options are provided, just return the whole thing.
+        if attrkey == None and exattrkey == None: 
             return self.dict_list
         else:
-            new_list = []
+            new_list = [] #temp list to store tracks included (attrkey, attrvalue)
 
-            if not attrkey == None:
+            if not attrkey == None: #check if an include filter was provided
                 for track in self.dict_list:
-                        if attrkey in track.keys():
+                        if attrkey in track.keys(): #check if the key exists to avoid errors
+                            #check all of the values in the attrvalue list against
+                            #the track values. If any of them match, then append the track
                             if any(val in track[attrkey] for val in attrvalue):
                                 new_list.append(track)
-            else:
+            else: #this means just the exclude filters were provided, so get the whole list
                 new_list = self.dict_list
 
-            new_new_list = []
+            new_new_list = [] #temp list to store tracks excluded (exattrkey, exattrvalue)
             if not exattrkey == None:
                 for track in new_list:
-                    if exattrkey in track.keys():
+                    if exattrkey in track.keys(): #check if exclude key exists to avoid errors
+                        #check all of the values in the exattrvalue list against the track
+                        #values. If any of them match, do NOT append the track.
                         if not any(val in track[exattrkey] for val in exattrvalue):
                             new_new_list.append(track)
                     else:
-                        new_new_list.append(track)
+                        new_new_list.append(track) #append the track if the key doesn't exist
             else:
-                return new_list
+                return new_list #if there is no exclude filter provided, then the job was done
 
             return new_new_list
