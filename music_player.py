@@ -26,7 +26,7 @@ def start_player(stdscr):
     tabs = []
     for tabconf in tabs_config:
         config_attr = [height, width, 
-                tabconf['tab-filter'], tabconf.get('filter-keys'), tabconf.get('pane-titles')]
+                tabconf['include-only'], tabconf['exclude'], tabconf.get('filter-keys'), tabconf.get('pane-titles')]
         tmp_tab = Tab(tabconf['tab-type'], config_attr, stdscr, database)
         tabs.append(tmp_tab)
 
@@ -49,7 +49,7 @@ def start_player(stdscr):
             tab.render_all_panes(True)
             tab.refresh_panes()
 
-        status_bar("Testing", stdscr, height, width)
+        status_bar(tabs[current_tab].filtered_tracks[0]["PATH"], stdscr, height, width)
 
         k = stdscr.getch()
 

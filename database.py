@@ -134,7 +134,7 @@ class Database:
             if path in track["PATH"]:
                 return track
 
-    def get_all_tracks_with(self, attrkey, attrvalue):
+    def get_all_tracks_with(self, attrkey, attrvalue, exattrkey, exattrvalue):
         """Return list of tracks with specified attributes.
         Args:
             attrkey (str): The attribute key or type.
@@ -144,7 +144,7 @@ class Database:
             list: List of track dictionaries."""
         if not attrkey == None:
             return [track for track in self.dict_list 
-                if attrkey in track.keys() 
-                if any(val in track[attrkey] for val in attrvalue)]
+                if attrkey in track.keys()
+                    if any(val in track[attrkey] for val in attrvalue)]
         else:
             return self.dict_list

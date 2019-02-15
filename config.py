@@ -33,11 +33,13 @@ ui_config = {
 tabs_config = [
             {
                 'tab-type': "SINGLE",
-                'tab-filter': ["COMPOSER", ["Bach"]]
+                'include-only': ["COMPOSER", ["Bach"]],
+                'exclude':[None, None]
             },
             {
                 'tab-type': "4-PANE",
-                'tab-filter': [None, None],
+                'include-only': [None, None],
+                'exclude': [None, None],
                 'filter-keys': ["GENRE", "ALBUM", "PERFORMER", "TRACK"],
                 'pane-titles': ["Genre", "Work", "Performer", None]
             }

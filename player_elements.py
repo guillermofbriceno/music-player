@@ -1,9 +1,22 @@
 #!/usr/bin/python3
 
 import sys,os
+from mpd import MPDClient
+
 from curses_elements import *
 from database import *
 from config import *
+
+def start_mpd_client():
+    client = MPDClient()
+    client.timeout = 10
+    client.idletimeout = None
+    client.connect("localhost", 6600)
+    return client
+
+def stop_mpd_client(client):
+    client.close()
+    client.disconnect()
 
 class Tab:
     def __init__(self, config_type, config_attr, stdscr, database):
@@ -15,6 +28,7 @@ class Tab:
         self.attr_values = [] #List of genres, List of albums, List of performers, "EMPTY" (Generated)
         self.filtered_tracks = []
         self.main_filter = [] #Main filter for the tab
+        self.exclude_filter = []
         self.current_pane = 0
         self.database = database
         self.scrll_start = ui_config['SCRLL-TH']
@@ -29,8 +43,10 @@ class Tab:
             raise ValueError("Invalid config type")
 
     def create_4_pane(self, config_attr):
-        window_height, window_width, self.main_filter, self.attr_keys, self.pane_titles = config_attr
-        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1])
+        window_height, window_width, self.main_filter, self.exclude_filter, self.attr_keys, self.pane_titles = config_attr
+
+        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1],
+                self.exclude_filter[0], self.exclude_filter[1])
 
         pane1 = List_Pane(window_height, window_width, #main window dims
                 window_height - 1, 30, #height and width of pane
@@ -58,9 +74,10 @@ class Tab:
         self.populate_lists()
 
     def create_single_pane(self, config_attr):
-        window_height, window_width, self.main_filter = [x for x in config_attr if x is not None]
-        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0],
-                self.main_filter[1])
+        window_height, window_width, self.main_filter, self.exclude_filter = [x for x in config_attr if x is not None]
+        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1], 
+                self.exclude_filter[0], self.exclude_filter[1])
+
         self.attr_keys.append("TRACK")
         self.attr_values.append("Empty")
         pane = Track_Pane(window_height, window_width, window_height - 1, window_width, 0, 0, self.scrll_start, self.stdscr)
@@ -70,7 +87,8 @@ class Tab:
 
     def populate_lists(self):
         #this func must be run at least once in the beginning
-        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1])
+        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1],
+                self.exclude_filter[0], self.exclude_filter[1])
         attr_values_tmp = []
         for key, pane in zip(self.attr_keys, self.panes):
             if not key == "TRACK" and not pane.selectedpos == None:
@@ -94,9 +112,10 @@ class Tab:
                     pane.render(self.filtered_tracks)
                 else:
                     pane.render(lst)
-               
+
     def activate_tab(self):
-        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1])
+        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1],
+                self.exclude_filter[0], self.exclude_filter[1])
         self.isActive = True
 
     def deactivate_tab(self):
@@ -145,10 +164,15 @@ class Tab:
 
     def play_track(self):
         if self.isActive:
+            client = start_mpd_client()
+
             subprocess.call(["mpc", "clear"], stdout=subprocess.PIPE)
 
             for track in self.filtered_tracks:
-                subprocess.call(["mpc", "add", track["PATH"]], stdout=subprocess.PIPE)
+                #subprocess.call(["mpc", "add", track["PATH"]], stdout=subprocess.PIPE)
+                client.add(track["PATH"])
 
             subprocess.call(["mpc", "play", 
                 str(self.panes[len(self.panes) - 1].trackpos + 1)], stdout=subprocess.PIPE)
+
+            stop_mpd_client(client)
