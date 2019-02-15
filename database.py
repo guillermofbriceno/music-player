@@ -143,12 +143,35 @@ class Database:
         Args:
             attrkey (str): The attribute key or type.
             attrvalue (list): The attribute(s) being matched for.
+            exattrkey (str): Atribute key or type.
+            exattrvalue (list): The attribute(s) to be excluded.
 
         Returns:
             list: List of track dictionaries."""
-        if not attrkey == None:
-            return [track for track in self.dict_list 
-                if attrkey in track.keys()
-                    if any(val in track[attrkey] for val in attrvalue)]
-        else:
+
+        #This code is very ugly. Find way to make it better.
+        if attrkey == None and exattrkey == None:
             return self.dict_list
+        else:
+            new_list = []
+
+            if not attrkey == None:
+                for track in self.dict_list:
+                        if attrkey in track.keys():
+                            if any(val in track[attrkey] for val in attrvalue):
+                                new_list.append(track)
+            else:
+                new_list = self.dict_list
+
+            new_new_list = []
+            if not exattrkey == None:
+                for track in new_list:
+                    if exattrkey in track.keys():
+                        if not any(val in track[exattrkey] for val in exattrvalue):
+                            new_new_list.append(track)
+                    else:
+                        new_new_list.append(track)
+            else:
+                return new_list
+
+            return new_new_list

@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 import curses
 
-#Database directory
-db_dir = ["/home/guillermo/programming/music-player/test-music", "/home/guillermo/bach/Files/Torrents/Music/Jazz"]
+#Database directory. Must match MPD music directories (multiple dirs not supported by MPD anyway)
+db_dir = ["/home/guillermo/programming/music-player/test-music"]
 
 #Keybindings
 number_keys = [ord(str(num)) for num in range(9)]
@@ -27,7 +27,7 @@ tabs_config = [
             {
                 'tab-type': "SINGLE",
                 'include-only': ["COMPOSER", ["Bach"]],
-                'exclude':[None, None]
+                'exclude': [None, None]
             },
             {
                 'tab-type': "4-PANE",
@@ -42,7 +42,15 @@ tabs_config = [
                 'exclude': [None, None],
                 'filter-keys': ["PERFORMER", "ALBUM", "TRACK"],
                 'pane-titles': ["Performer", "Work", None]
+            },
+            {
+                'tab-type': "3-PANE",
+                'include-only': [None, None],
+                'exclude': ["COMPOSER", ["Bach"]],
+                'filter-keys': ["ARTIST", "ALBUM", "TRACK"],
+                'pane-titles': ["Artist", "Album", None]
             }
+
 
         ]
 

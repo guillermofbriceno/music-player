@@ -50,7 +50,8 @@ def start_player(stdscr):
             tab.render_all_panes(k is not curses.ERR)
             tab.refresh_panes()
 
-        status_bar(tabs[current_tab].filtered_tracks[0]["PATH"], stdscr, height, width)
+        status_bar("TEST", stdscr, height, width)
+        #status_bar(tabs[current_tab].filtered_tracks[0]["PATH"], stdscr, height, width)
 
         k = stdscr.getch()
 
