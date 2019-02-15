@@ -33,6 +33,7 @@ def start_player(stdscr):
     tabs[0].activate_tab()
     member_func('refresh_panes', tabs)
 
+    curses.halfdelay(15)
     k = 100
     current_tab = 0
 
@@ -46,7 +47,7 @@ def start_player(stdscr):
             stdscr.erase()
 
         for tab in tabs:
-            tab.render_all_panes(True)
+            tab.render_all_panes(k is not curses.ERR)
             tab.refresh_panes()
 
         status_bar(tabs[current_tab].filtered_tracks[0]["PATH"], stdscr, height, width)
@@ -59,6 +60,7 @@ def member_func(f, obj_list):
         func(obj)
 
 def main():
+    os.environ.setdefault('ESCDELAY', '25')
     curses.wrapper(start_player)
 
 if __name__ == "__main__":

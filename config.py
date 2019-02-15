@@ -13,23 +13,15 @@ mvmt_keys = {
             'h': 'move_left',
             'l': 'move_right',
             'n': 'play_track',
-            't': 'jump_to_track_pane'
+            't': 'jump_to_track_pane',
+            's': 'shuffle',
             }
 
 #Interface configuration
 ui_config = {
             'SCRLL-TH': 8
+            'refresh-delay': 15
             }
-
-#tab_filter = ["COMPOSER", ["Bach"]]
-#config_attr = [height, width, tab_filter]
-#alltracks_tab = Tab("SINGLE", config_attr, stdscr, database)
-
-#tab_filter = ["COMPOSER", ["Bach"]]
-#filter_keys = ["GENRE", "ALBUM", "PERFORMER", "TRACK"]
-#pane_titles = ["Genre", "Work", "Performer", None]
-#config_attr = [height, width, tab_filter, filter_keys, pane_titles]
-#genre_tab = Tab("4-PANE", config_attr, stdscr, database)
 
 tabs_config = [
             {
