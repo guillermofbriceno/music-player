@@ -3,6 +3,7 @@ import curses
 
 #Database directory. Must match MPD music directories (multiple dirs not supported by MPD anyway)
 db_dir = ["/home/guillermo/programming/music-player/test-music"]
+playlists_dir = "/home/guillermo/programming/music-player/playlists"
 
 #Keybindings
 number_keys = [ord(str(num)) for num in range(9)]

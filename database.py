@@ -75,6 +75,31 @@ def database_file_already_exists(file_name):
         bool: Whether or not the file was found"""
     return os.path.isfile(os.getcwd() + "/" + file_name)
 
+def cut_brackets(tag):
+        string = str(tag)
+        string = string[2:]
+        string = string[:-2]
+        return string
+
+def create_track(path, dir_str):
+    track = taglib.File(path)
+    #Read the dict from taglib by removing the brackets from the values
+    tmp_tagdict = {k: cut_brackets(tag) for k, tag in track.tags.items()}
+    #Add length and path to the track dictionary. Absolute path cut MPC prep
+    tmp_tagdict["PATH"] = str(path)[len(dir_str) + 1:]
+    tmp_tagdict["LENGTH"] = track.length
+    #Handle weird tracknumber cases for sorting methods
+    tracknum_tmp = tmp_tagdict["TRACKNUMBER"]
+    if '/' in tracknum_tmp:
+        tmp_tagdict["TRACKNUMBER"] = tracknum_tmp[:-tracknum_tmp.rfind("/") - 1]
+    elif tracknum_tmp.isdigit():
+        pass
+    else:
+        tmp_tagdict["TRACKNUMBER"] = "0"
+
+    return tmp_tagdict
+
+
 class Database:
     """A representation of the entire music library.
     Args:
@@ -94,34 +119,13 @@ class Database:
         for dir_str in directory_strs:
             pathlist_gen = Path(dir_str).glob(mask)
             for path in pathlist_gen:
-
-                track = taglib.File(path)
-
-                #Read the dict from taglib by removing the brackets from the values
-                tmp_tagdict = {k: self.cut_brackets(tag) for k, tag in track.tags.items()}
-
-                #Add length and path to the track dictionary. Absolute path cut MPC prep
-                tmp_tagdict["PATH"] = str(path)[len(dir_str) + 1:]
-
-                tmp_tagdict["LENGTH"] = track.length
-
-                #Handle weird tracknumber cases for sorting methods
-                tracknum_tmp = tmp_tagdict["TRACKNUMBER"]
-                if '/' in tracknum_tmp:
-                    tmp_tagdict["TRACKNUMBER"] = tracknum_tmp[:-tracknum_tmp.rfind("/") - 1]
-                elif tracknum_tmp.isdigit():
-                    pass
-                else:
-                    tmp_tagdict["TRACKNUMBER"] = "0"
-
+                tmp_tagdict = create_track(path, dir_str)
                 self.dict_list.append(tmp_tagdict)
 
-    def cut_brackets(self, tag):
-        string = str(tag)
-        string = string[2:]
-        string = string[:-2]
-        return string
+    def generate_playlists(self, playlists_dir):
+        pass
 
+    
     def sort_tracks(self, method):
         if method == "NORMAL":
             normal_sort(self.dict_list)
@@ -175,3 +179,21 @@ class Database:
                 return new_list
 
             return new_new_list
+
+class Playlists:
+    def __init__(self, playlists_dir):
+        pass
+    
+    def generate_playlists(self):
+        pass
+
+    def get_playlist_names(self):
+        pass
+
+    def get_playlist_by_name(self, playlist):
+        pass
+
+    def get_playlist_by_index(self, index):
+        pass
+
+
