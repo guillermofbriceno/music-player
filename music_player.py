@@ -38,6 +38,8 @@ def start_player(stdscr):
     current_tab = 0
 
     while(k != ord('q')):
+        status_bar("TEST", stdscr, height, width)
+
         if k in mvmt_keys:
             member_func(mvmt_keys[k], tabs)
         elif k in number_keys:
@@ -45,12 +47,12 @@ def start_player(stdscr):
             current_tab = int(chr(k)) - 1
             tabs[current_tab].activate_tab()
             stdscr.erase()
+            status_bar("TEST", stdscr, height, width)
 
         for tab in tabs:
             tab.render_all_panes(k is not curses.ERR)
             tab.refresh_panes()
 
-        status_bar("TEST", stdscr, height, width)
         #status_bar(tabs[current_tab].filtered_tracks[0]["PATH"], stdscr, height, width)
 
         k = stdscr.getch()

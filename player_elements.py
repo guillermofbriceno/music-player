@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import sys,os
-from mpd import MPDClient
+from mpd import MPDClient, MPDError, CommandError
 
 from curses_elements import *
 from database import *
@@ -202,13 +202,17 @@ class Tab:
             client = start_mpd_client()
 
             subprocess.call(["mpc", "clear"], stdout=subprocess.PIPE)
+            try:
+                for track in self.filtered_tracks:
+                    #subprocess.call(["mpc", "add", track["PATH"]], stdout=subprocess.PIPE)
+                    client.add(track["PATH"])
 
-            for track in self.filtered_tracks:
-                #subprocess.call(["mpc", "add", track["PATH"]], stdout=subprocess.PIPE)
-                client.add(track["PATH"])
+                subprocess.call(["mpc", "play", 
+                    str(self.panes[len(self.panes) - 1].trackpos + 1)], stdout=subprocess.PIPE)
+            except CommandError as e:
+                height, width = self.stdscr.getmaxyx()
+                status_bar("MPD Error: " + str(e), self.stdscr, height, width)
 
-            subprocess.call(["mpc", "play", 
-                str(self.panes[len(self.panes) - 1].trackpos + 1)], stdout=subprocess.PIPE)
 
             stop_mpd_client(client)
 
