@@ -54,17 +54,21 @@ def get_tracks_with(dict_list, attrkey, attrvalue):
                 if any(val in track[attrkey] for val in attrvalue)]
 
 
-def start_database(directory_strs):
+def start_database(directory_strs, playlists_dir):
     database_name = directory_strs[0][directory_strs[0].rfind("/") + 1:] + "-db"
     if database_file_already_exists(database_name):
         db_file = open(database_name, 'rb')
         database = pickle.load(db_file)
+        playlists = Playlists(playlists_dir, directory_strs)
+        database.add_playlists(playlists)
         return database
     else:
         print("Database file not found, creating one...")
         database = Database(directory_strs)
         db_file = open(database_name, 'wb')
         pickle.dump(database, db_file)
+        playlists = Playlists(playlists_dir, directory_strs)
+        database.add_playlists(playlists)
         return database
 
 def database_file_already_exists(file_name):
@@ -105,7 +109,7 @@ class Database:
     Args:
         directory_str (str): The directory of the music folder.
     """
-    def __init__(self, directory_strs):
+    def __init__(self, directory_strs, playlist_dir):
         self.dict_list = []
         self.directory_strs = directory_strs
         self.generate_database(directory_strs)
@@ -122,10 +126,6 @@ class Database:
                 tmp_tagdict = create_track(path, dir_str)
                 self.dict_list.append(tmp_tagdict)
 
-    def generate_playlists(self, playlists_dir):
-        pass
-
-    
     def sort_tracks(self, method):
         if method == "NORMAL":
             normal_sort(self.dict_list)
@@ -152,8 +152,11 @@ class Database:
 
         Returns:
             list: List of track dictionaries."""
+        
+        if attrkey == "PLAYLISTS":
+            return self.playlists.playlist_dict_list
 
-        #This code is very ugly. Find way to make it better.b
+        #This code is very ugly. Find way to make it better.
 
         #If no filter options are provided, just return the whole thing.
         if attrkey == None and exattrkey == None: 
@@ -186,13 +189,27 @@ class Database:
 
             return new_new_list
 
-class Playlists:
-    def __init__(self, playlists_dir):
-        pass
-    
-    def generate_playlists(self):
-        pass
+    def add_playlists(self, playlists):
+        self.playlists = playlists
 
+class Playlists:
+    def __init__(self, playlists_dir, dir_strs):
+        self.playlist_dict_list = []
+        self.populate_playlist_tracks(playlists_dir, dir_strs)
+
+    def populate_playlist_tracks(self, playlist_dir, dir_strs):
+        pathlist_gen = Path(playlist_dir).glob('*.m3u')
+        for path in pathlist_gen:
+            with open(path) as playlist:
+                head, playlist_file_name = os.path.split(path)
+                playlist_file_name = playlist_file_name[:-4]
+                for track_path in playlist:
+                    if not track_path == '\n':
+                        track_path = track_path.rstrip("\n\r")
+                        tmp_tagdict = create_track(dir_strs[0] + "/" + track_path, dir_strs[0])
+                        tmp_tagdict["PLAYLIST"] = playlist_file_name
+                        self.playlist_dict_list.append(tmp_tagdict)
+    
     def get_playlist_names(self):
         pass
 

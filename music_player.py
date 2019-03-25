@@ -21,12 +21,12 @@ def start_player(stdscr):
     load_curses_config(stdscr)
 
     height, width = stdscr.getmaxyx()
-    database = start_database(db_dir)
+    database = start_database(db_dir, playlists_dir)
 
     tabs = []
     for tabconf in tabs_config:
         config_attr = [height, width, 
-                tabconf['include-only'], tabconf['exclude'], tabconf.get('filter-keys'), tabconf.get('pane-titles')]
+                tabconf.get('include-only'), tabconf.get('exclude'), tabconf.get('filter-keys'), tabconf.get('pane-titles')]
         tmp_tab = Tab(tabconf['tab-type'], config_attr, stdscr, database)
         tabs.append(tmp_tab)
 

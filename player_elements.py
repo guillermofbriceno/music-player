@@ -41,9 +41,56 @@ class Tab:
         elif config_type == "3-PANE":
             self.create_3_pane(config_attr)
         elif config_type == "2-PANE":
-            raise NotImplementedError("Config type " + config_type + " not implemented")
+            self.create_2_pane(config_attr)
+        elif config_type == "PLAYLIST":
+            self.create_playlist_tab(config_attr)
         else:
             raise ValueError("Invalid config type")
+
+    def create_2_pane(self, config_attr):
+        self.window_dims[0], self.window_dims[1], self.main_filter, self.exclude_filter, self.attr_keys, self.pane_titles = config_attr
+
+        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1],
+                self.exclude_filter[0], self.exclude_filter[1])
+
+        pane1 = List_Pane(self.window_dims[0], self.window_dims[1], #main window dims
+                self.window_dims[0] - 1, 30, #height and width of pane
+                0, 0, #y and x position of top left corner of pane
+                self.scrll_start, self.stdscr, self.pane_titles[0])
+
+        pane2 = Track_Pane(self.window_dims[0], self.window_dims[1], 
+                self.window_dims[0] - 1, self.window_dims[1] - 29, 
+                0, 29, 
+                self.scrll_start, self.stdscr)
+
+        pane1.activate()
+        self.panes = [pane1, pane2]
+        self.refresh_panes()
+   
+    def create_playlist_tab(self, config_attr):
+        self.window_dims[0], self.window_dims[1], x, y, z, k = config_attr
+
+        self.attr_keys.append("PLAYLIST")
+        self.attr_values.append("Empty")
+        self.main_filter = ["PLAYLISTS", None]
+        self.exclude_filter = [None, None]
+        self.pane_titles = ["Playlist", "TRACK"]
+       
+        self.filtered_tracks = self.database.get_all_tracks_with("PLAYLISTS", None, None, None)
+
+        pane1 = List_Pane(self.window_dims[0], self.window_dims[1], #main window dims
+                self.window_dims[0] - 1, 30, #height and width of pane
+                0, 0, #y and x position of top left corner of pane
+                self.scrll_start, self.stdscr, self.pane_titles[0])
+
+        pane2 = Track_Pane(self.window_dims[0], self.window_dims[1], 
+                self.window_dims[0] - 1, self.window_dims[1] - 29, 
+                0, 29, 
+                self.scrll_start, self.stdscr)
+
+        pane1.activate()
+        self.panes = [pane1, pane2]
+        self.refresh_panes()
 
     def create_4_pane(self, config_attr):
         self.window_dims[0], self.window_dims[1], self.main_filter, self.exclude_filter, self.attr_keys, self.pane_titles = config_attr
@@ -99,8 +146,6 @@ class Tab:
         pane1.activate()
         self.panes = [pane1, pane2, pane3]
         self.refresh_panes()
-        self.populate_lists()
-        self.populate_lists()
 
     def create_single_pane(self, config_attr):
         self.window_dims[0], self.window_dims[1], self.main_filter, self.exclude_filter = [x for x in config_attr if x is not None]
@@ -189,7 +234,7 @@ class Tab:
             for pane in self.panes:
                 pane.refresh()
 
-    def clear_panes(sefl):
+    def clear_panes(self):
         for pane in self.panes:
             pane.clear()
 

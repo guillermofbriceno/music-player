@@ -50,11 +50,39 @@ tabs_config = [
                 'exclude': ["COMPOSER", ["Bach"]],
                 'filter-keys': ["ARTIST", "ALBUM", "TRACK"],
                 'pane-titles': ["Artist", "Album", None]
+            },
+            {
+                'tab-type': "PLAYLIST"
+            },
+            {
+                'tab-type': "2-PANE",
+                'include-only': ["PLAYLISTS", None],
+                'exclude': [None, None],
+                'filter-keys': ["PLAYLIST", "TRACK"],
+                'pane-titles': ["Playlist", None]
             }
-
-
         ]
 
+#Example Tab Config
+#tabs_config = [
+#            {
+#                'tab-type': "3-PANE",
+#                'include-only': [None, None],
+#                'exclude': ["COMPOSER", ["Bach"]],
+#                'filter-keys': ["ARTIST", "ALBUM", "TRACK"],
+#                'pane-titles': ["Artist", "Album", None]
+#            },
+#            {
+#                'tab-type': "PLAYLIST"
+#            },
+#            {
+#                'tab-type': "2-PANE",
+#                'include-only': ["PLAYLISTS", None],
+#                'exclude': [None, None],
+#                'filter-keys': ["PLAYLIST", "TRACK"],
+#                'pane-titles': ["Playlist", None]
+#            }
+#        ]
 
 
 #Curses settings
