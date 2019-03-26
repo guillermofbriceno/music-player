@@ -59,7 +59,7 @@ def start_database(directory_strs, playlists_dir):
     if database_file_already_exists(database_name):
         db_file = open(database_name, 'rb')
         database = pickle.load(db_file)
-        playlists = Playlists(playlists_dir, directory_strs)
+        playlists = Playlists(playlists_dir, directory_strs, database)
         database.add_playlists(playlists)
         return database
     else:
@@ -67,7 +67,7 @@ def start_database(directory_strs, playlists_dir):
         database = Database(directory_strs)
         db_file = open(database_name, 'wb')
         pickle.dump(database, db_file)
-        playlists = Playlists(playlists_dir, directory_strs)
+        playlists = Playlists(playlists_dir, directory_strs, database)
         database.add_playlists(playlists)
         return database
 
@@ -193,8 +193,9 @@ class Database:
         self.playlists = playlists
 
 class Playlists:
-    def __init__(self, playlists_dir, dir_strs):
+    def __init__(self, playlists_dir, dir_strs, database):
         self.playlist_dict_list = []
+        self.database = database
         self.populate_playlist_tracks(playlists_dir, dir_strs)
 
     def populate_playlist_tracks(self, playlist_dir, dir_strs):
@@ -206,7 +207,7 @@ class Playlists:
                 for track_path in playlist:
                     if not track_path == '\n':
                         track_path = track_path.rstrip("\n\r")
-                        tmp_tagdict = create_track(dir_strs[0] + "/" + track_path, dir_strs[0])
+                        tmp_tagdict = next(track for track in self.database.dict_list if track["PATH"] == track_path)
                         tmp_tagdict["PLAYLIST"] = playlist_file_name
                         self.playlist_dict_list.append(tmp_tagdict)
     
