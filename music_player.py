@@ -23,22 +23,25 @@ def start_player(stdscr):
     height, width = stdscr.getmaxyx()
     database = start_database(db_dir, playlists_dir)
 
+    status_bar = Status_Bar("TEST", stdscr, height, width)
+
     tabs = []
     for tabconf in tabs_config:
         config_attr = [height, width, 
                 tabconf.get('include-only'), tabconf.get('exclude'), tabconf.get('filter-keys'), tabconf.get('pane-titles')]
-        tmp_tab = Tab(tabconf['tab-type'], config_attr, stdscr, database)
+        tmp_tab = Tab(tabconf['tab-type'], config_attr, stdscr, database, status_bar)
         tabs.append(tmp_tab)
 
     tabs[0].activate_tab()
     member_func('refresh_panes', tabs)
+    
 
     curses.halfdelay(15)
     k = 100
     current_tab = 0
 
     while(k != ord('q')):
-        status_bar("TEST", stdscr, height, width)
+        status_bar.render_bar()
 
         if k in mvmt_keys:
             member_func(mvmt_keys[k], tabs)
@@ -47,7 +50,7 @@ def start_player(stdscr):
             current_tab = int(chr(k)) - 1
             tabs[current_tab].activate_tab()
             stdscr.erase()
-            status_bar("TEST", stdscr, height, width)
+            status_bar.render_bar()
 
         for tab in tabs:
             tab.render_all_panes(k is not curses.ERR)

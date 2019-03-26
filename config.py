@@ -2,7 +2,7 @@
 import curses
 
 #Database directory. Must match MPD music directories (multiple dirs not supported by MPD anyway)
-db_dir = ["/home/guillermo/programming/music-player/test-music"]
+db_dir = ["/home/guillermo/bach/Music/all-music"]
 playlists_dir = "/home/guillermo/programming/music-player/playlists"
 
 #Keybindings
@@ -16,6 +16,8 @@ mvmt_keys = {
             'n': 'play_track',
             't': 'jump_to_track_pane',
             's': 'shuffle',
+            'f': 'search_mode',
+            '\x1b': 'reset_tab'
             }
 
 #Interface configuration
@@ -32,14 +34,14 @@ tabs_config = [
             },
             {
                 'tab-type': "4-PANE",
-                'include-only': [None, None],
+                'include-only': ["COMPOSER", ["Bach"]],
                 'exclude': [None, None],
                 'filter-keys': ["GENRE", "ALBUM", "PERFORMER", "TRACK"],
                 'pane-titles': ["Genre", "Work", "Performer", None]
             },
             {
                 'tab-type': "3-PANE",
-                'include-only': [None, None],
+                'include-only': ["COMPOSER", ["Bach"]],
                 'exclude': [None, None],
                 'filter-keys': ["PERFORMER", "ALBUM", "TRACK"],
                 'pane-titles': ["Performer", "Work", None]
@@ -50,6 +52,13 @@ tabs_config = [
                 'exclude': ["COMPOSER", ["Bach"]],
                 'filter-keys': ["ARTIST", "ALBUM", "TRACK"],
                 'pane-titles': ["Artist", "Album", None]
+            },
+            {
+                'tab-type': "3-PANE",
+                'include-only': [None, None],
+                'exclude': ["COMPOSER", ["Bach"]],
+                'filter-keys': ["GENRE", "ALBUM", "TRACK"],
+                'pane-titles': ["Genre", "Album", None]
             },
             {
                 'tab-type': "PLAYLIST"

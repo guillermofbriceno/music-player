@@ -109,7 +109,7 @@ class Database:
     Args:
         directory_str (str): The directory of the music folder.
     """
-    def __init__(self, directory_strs, playlist_dir):
+    def __init__(self, directory_strs):
         self.dict_list = []
         self.directory_strs = directory_strs
         self.generate_database(directory_strs)

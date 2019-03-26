@@ -19,7 +19,7 @@ def stop_mpd_client(client):
     client.disconnect()
 
 class Tab:
-    def __init__(self, config_type, config_attr, stdscr, database):
+    def __init__(self, config_type, config_attr, stdscr, database, status_bar):
         self.panes = []
         self.pane_titles = []
         self.stdscr = stdscr
@@ -33,6 +33,8 @@ class Tab:
         self.database = database
         self.scrll_start = ui_config['SCRLL-TH']
         self.window_dims = [None, None]
+        self.status_bar = status_bar
+        self.do_not_overwrite = False
 
         if config_type == "SINGLE":
             self.create_single_pane(config_attr)
@@ -161,8 +163,7 @@ class Tab:
 
     def populate_lists(self):
         #this func must be run at least once in the beginning
-        self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1],
-                self.exclude_filter[0], self.exclude_filter[1])
+        self.load_all_tracks()
         attr_values_tmp = []
         for key, pane in zip(self.attr_keys, self.panes):
             if not key == "TRACK" and not pane.selectedpos == None:
@@ -196,6 +197,10 @@ class Tab:
         self.isActive = False
         del self.filtered_tracks
 
+    def load_all_tracks(self):
+        if self.isActive and not self.do_not_overwrite:
+            self.filtered_tracks = self.database.get_all_tracks_with(self.main_filter[0], self.main_filter[1], self.exclude_filter[0], self.exclude_filter[1])
+
     def move_up(self):
         if self.isActive:
             for pane in self.panes:
@@ -210,7 +215,7 @@ class Tab:
                     pane.move_down_one(len(self.filtered_tracks))
 
     def move_left(self):
-        if not self.current_pane == 0 and self.isActive:
+        if not self.current_pane == 0 and self.isActive and not self.do_not_overwrite:
             self.panes[self.current_pane].deactivate()
             self.panes[self.current_pane].stop_showing_position()
             self.panes[self.current_pane].clear()
@@ -237,10 +242,40 @@ class Tab:
     def clear_panes(self):
         for pane in self.panes:
             pane.clear()
+     
+    def reset_tab(self):
+        if self.isActive:
+            self.do_not_overwrite = False
+            self.load_all_tracks()
+            self.render_all_panes(True)
+            self.refresh_panes()
 
     def search_mode(self):
-        while (k != enter):
-            pass
+        if self.isActive:
+            curses.cbreak()
+            k = 100
+            self.status_bar.set_bar_string("find: ")
+            self.status_bar.render_bar()
+            self.jump_to_track_pane()
+            while (k != 27):
+                self.render_all_panes(False)
+                self.refresh_panes()
+                k = self.stdscr.getch()
+                if k == ord('\n'):
+                    self.do_not_overwrite = True
+                    break
+                elif k != ord('ć'):
+                    self.status_bar.set_bar_string(self.status_bar.get_bar_string() + str(chr(k)))
+                elif len(self.status_bar.get_bar_string()) > 6:
+                    self.status_bar.set_bar_string(self.status_bar.get_bar_string()[:-1])
+                    self.load_all_tracks()
+                
+                self.status_bar.render_bar()
+                self.filtered_tracks = get_tracks_with(self.filtered_tracks, "TITLE", [self.status_bar.get_bar_string()[6:]])
+
+            curses.halfdelay(15)
+            self.status_bar.set_bar_string("TEST2")
+            self.status_bar.render_bar()
 
     def play_track(self):
         if self.isActive:
@@ -256,7 +291,7 @@ class Tab:
                     str(self.panes[len(self.panes) - 1].trackpos + 1)], stdout=subprocess.PIPE)
             except CommandError as e:
                 height, width = self.stdscr.getmaxyx()
-                status_bar("MPD Error: " + str(e), self.stdscr, height, width)
+                status_bar.set_bar_string("MPD Error: " + str(e))
 
 
             stop_mpd_client(client)
