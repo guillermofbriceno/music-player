@@ -210,14 +210,3 @@ class Playlists:
                         tmp_tagdict = next(track for track in self.database.dict_list if track["PATH"] == track_path)
                         tmp_tagdict["PLAYLIST"] = playlist_file_name
                         self.playlist_dict_list.append(tmp_tagdict)
-    
-    def get_playlist_names(self):
-        pass
-
-    def get_playlist_by_name(self, playlist):
-        pass
-
-    def get_playlist_by_index(self, index):
-        pass
-
-

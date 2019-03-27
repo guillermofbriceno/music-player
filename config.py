@@ -17,7 +17,8 @@ mvmt_keys = {
             't': 'jump_to_track_pane',
             's': 'shuffle',
             'f': 'search_mode',
-            '\x1b': 'reset_tab'
+            '\x1b': 'reset_tab',
+            ' ': 'select_track'
             }
 
 #Interface configuration
@@ -104,7 +105,8 @@ def load_curses_config(stdscr):
     curses.init_pair(3, curses.COLOR_BLACK, 124)
     curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_WHITE)
     curses.init_pair(5, curses.COLOR_BLACK, 124)
-    curses.init_pair(6, 124, curses.COLOR_BLACK)
+    curses.init_pair(6, 124, curses.COLOR_BLACK) #list cursor color
+    curses.init_pair(7, curses.COLOR_BLACK, curses.COLOR_WHITE) #selected tracks
 
 
 ############

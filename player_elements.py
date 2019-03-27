@@ -23,6 +23,7 @@ class Tab:
         self.window_dims = [None, None]
         self.status_bar = status_bar
         self.do_not_overwrite = False
+        self.selected_tracks = []
 
         if config_type == "SINGLE":
             self.create_single_pane(config_attr)
@@ -172,7 +173,7 @@ class Tab:
 
             for pane, lst in zip(self.panes, self.attr_values):
                 if pane.is_track_pane():
-                    pane.render(self.filtered_tracks)
+                    pane.render(self.filtered_tracks, self.selected_tracks)
                 else:
                     pane.render(lst)
 
@@ -235,8 +236,22 @@ class Tab:
         if self.isActive:
             self.do_not_overwrite = False
             self.load_all_tracks()
+            self.selected_tracks = []
             self.render_all_panes(True)
             self.refresh_panes()
+
+    def select_track(self):
+        if self.isActive:
+            if self.panes[self.current_pane].is_track_pane():
+                path = self.filtered_tracks[self.panes[self.current_pane].trackpos]["PATH"]
+                if path in self.selected_tracks:
+                    self.selected_tracks.remove(path)
+                    self.move_down()
+                else:
+                    self.selected_tracks.append(path)
+                    self.move_down()
+            else:
+                self.selected_tracks += [track["PATH"] for track in self.filtered_tracks]
 
     def search_mode(self):
         if self.isActive:
@@ -263,7 +278,6 @@ class Tab:
                 self.filtered_tracks = get_tracks_with(self.filtered_tracks, "TITLE", [self.status_bar.get_bar_string()[6:]])
 
             curses.halfdelay(15)
-            self.status_bar.set_bar_string("TEST2")
             self.status_bar.render_bar()
 
     def play_track(self):

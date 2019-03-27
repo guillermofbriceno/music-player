@@ -140,7 +140,7 @@ class Track_Pane:
         self.pane = curses.newwin(pane_height, pane_width, ypos, xpos)
         self.pane.refresh()
 
-    def render(self, track_dicts):
+    def render(self, track_dicts, selected_track_paths):
         empty_dict = {  "TITLE":" ",
                         "PATH": " ",
                         "TRACKNUMBER": " ",
@@ -180,6 +180,9 @@ class Track_Pane:
 
             if self.vertpos == i and self.can_show_position:
                 self.pane.attron(curses.color_pair(3))
+                self.pane.addstr(i + 1, len(title), " " * (self.pane_width - len(title) - 8) + tracktime)
+            elif trackpath in selected_track_paths:
+                self.pane.attron(curses.color_pair(7))
                 self.pane.addstr(i + 1, len(title), " " * (self.pane_width - len(title) - 8) + tracktime)
             else:
                 if not trackIsNowPlaying:
