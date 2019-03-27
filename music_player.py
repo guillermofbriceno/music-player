@@ -23,7 +23,7 @@ def start_player(stdscr):
     height, width = stdscr.getmaxyx()
     database = start_database(db_dir, playlists_dir)
 
-    status_bar = Status_Bar("TEST", stdscr, height, width)
+    status_bar = Status_Bar("Welcome!", stdscr, height, width)
 
     tabs = []
     for tabconf in tabs_config:
@@ -34,7 +34,8 @@ def start_player(stdscr):
 
     tabs[0].activate_tab()
     member_func('refresh_panes', tabs)
-    
+   
+    status_bar.set_number_of_tabs(len(tabs))
 
     curses.halfdelay(15)
     k = 100
@@ -45,18 +46,19 @@ def start_player(stdscr):
 
         if k in mvmt_keys:
             member_func(mvmt_keys[k], tabs)
-        elif k in number_keys:
+        elif k in number_keys and int(chr(k)) < len(tabs):
             tabs[current_tab].deactivate_tab()
             current_tab = int(chr(k)) - 1
             tabs[current_tab].activate_tab()
             stdscr.erase()
+            status_bar.set_current_tab(current_tab + 1)
             status_bar.render_bar()
 
         for tab in tabs:
             tab.render_all_panes(k is not curses.ERR)
             tab.refresh_panes()
 
-        #status_bar(tabs[current_tab].filtered_tracks[0]["PATH"], stdscr, height, width)
+        status_bar.set_bar_string("DEFAULT")
 
         k = stdscr.getch()
 

@@ -6,6 +6,37 @@ import datetime
 import time
 import subprocess
 from subprocess import call
+from mpd import MPDClient, MPDError, CommandError
+
+def start_mpd_client():
+    client = MPDClient()
+    client.timeout = 10
+    client.idletimeout = None
+    client.connect("localhost", 6600)
+    return client
+
+def stop_mpd_client(client):
+    client.close()
+    client.disconnect()
+
+def mpd_get_current_playing():
+    client = start_mpd_client()
+    song = client.currentsong()
+    stop_mpd_client(client)
+    return song
+
+def mpd_get_status():
+    client = start_mpd_client()
+    status = client.status()
+    stop_mpd_client(client)
+    return status
+
+def seconds_to_minutes(seconds):
+    m, s = divmod(seconds, 60)
+    return '{:02d}:{:02d}'.format(m, s)
+
+def norm(size, string):
+    return " " * (size - len(string)) + string
 
 class Status_Bar:
     def __init__(self, first_string, stdscr, ypos, width):
@@ -14,18 +45,66 @@ class Status_Bar:
         self.ypos = ypos
         self.width = width
         self.set_bar_string(first_string)
+        self.number_of_tabs = 1
+        self.current_tab = 1
     
     def set_bar_string(self, string):
-        self.bar_string = string
+        if string == "DEFAULT":
+            track = mpd_get_current_playing()
+            if "title" in track:
+                str1 = track["title"]
+            else:
+                str1 = "No Track"
+            self.bar_string = str1
+            pass
+        else:
+            self.bar_string = string
+
     
     def render_bar(self):
         self.stdscr.attron(curses.color_pair(5))
-        self.stdscr.addstr(self.ypos - 1, 0, self.bar_string)
-        self.stdscr.addstr(self.ypos - 1, len(self.bar_string), " " * (self.width - len(self.bar_string) - 1))
+        status = mpd_get_status()
+        state = norm(5, status["state"])
+        if "elapsed" in status:
+            elapsed_time = seconds_to_minutes(round(float(status["elapsed"])))
+            duration = seconds_to_minutes(round(float(status["duration"])))
+            time = elapsed_time + "/" + duration
+            audio = status["audio"]
+            bitrate = status["bitrate"]
+        else:
+            time = " "
+            audio = " "
+            bitrate = " "
+            
+        playlistlength = norm(4, status["playlistlength"])
+        info_string = norm(20, "[" + audio + " @ " + bitrate + "kbps" + "]")
+        left_aligned = self.bar_string + "  |  " + info_string
+        right_aligned =  time + " | " + playlistlength + " Tracks Queued  | " + state + " | " + self.create_tab_string()
+        full_string = left_aligned + " " * (self.width - (len(right_aligned) + len(left_aligned)) - 3) + right_aligned
+
+        self.stdscr.addstr(self.ypos - 1, 0, full_string)
+        self.stdscr.addstr(self.ypos - 1, len(full_string), " " * (self.width - len(full_string) - 1))
+
         self.stdscr.attroff(curses.color_pair(5))
 
     def get_bar_string(self):
         return self.bar_string
+    
+    def set_number_of_tabs(self, num):
+        self.number_of_tabs = num
+
+    def set_current_tab(self, num):
+        self.current_tab = num
+
+    def create_tab_string(self):
+        string = ""
+        for tab in range(1, self.number_of_tabs):
+            if tab == self.current_tab:
+                string += " [" + str(tab) + "] "
+            else:
+                string += "  " + str(tab) + "  "
+
+        return string
 
 class Track_Pane:
     def __init__(self, global_height, global_width, pane_height, pane_width, ypos, xpos, startscroll, stdscr):

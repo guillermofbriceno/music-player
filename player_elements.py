@@ -1,22 +1,10 @@
 #!/usr/bin/python3
 
 import sys,os
-from mpd import MPDClient, MPDError, CommandError
 
 from curses_elements import *
 from database import *
 from config import *
-
-def start_mpd_client():
-    client = MPDClient()
-    client.timeout = 10
-    client.idletimeout = None
-    client.connect("localhost", 6600)
-    return client
-
-def stop_mpd_client(client):
-    client.close()
-    client.disconnect()
 
 class Tab:
     def __init__(self, config_type, config_attr, stdscr, database, status_bar):
@@ -263,6 +251,7 @@ class Tab:
                 k = self.stdscr.getch()
                 if k == ord('\n'):
                     self.do_not_overwrite = True
+                    self.panes[self.current_pane].clear() #to ensure the selected track is within the bounds of the found tracks
                     break
                 elif k != ord('ć'):
                     self.status_bar.set_bar_string(self.status_bar.get_bar_string() + str(chr(k)))
