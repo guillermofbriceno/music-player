@@ -344,6 +344,11 @@ class List_Pane:
         self.selectedpos = None
         self.scrolloffset = 0
 
+    def reset_pos(self):
+        self.vertpos = 0
+        self.selectedpos = 0
+        self.scrolloffset = 0
+
     def refresh(self):
         self.pane.refresh()
         self.render_borders()

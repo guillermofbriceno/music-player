@@ -266,7 +266,11 @@ class Tab:
                 k = self.stdscr.getch()
                 if k == ord('\n'):
                     self.do_not_overwrite = True
+                    #Remember at this point, current pane is the track pane
                     self.panes[self.current_pane].clear() #to ensure the selected track is within the bounds of the found tracks
+                    for pane in self.panes:
+                        if not pane.is_track_pane() and pane.can_show_position:
+                            pane.reset_pos()
                     break
                 elif k != ord('ć'):
                     self.status_bar.set_bar_string(self.status_bar.get_bar_string() + str(chr(k)))
