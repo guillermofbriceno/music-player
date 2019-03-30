@@ -106,166 +106,6 @@ class Status_Bar:
 
         return string
 
-class Track_Pane:
-    def __init__(self, global_height, global_width, pane_height, pane_width, ypos, xpos, startscroll, stdscr):
-        """Initializes a track pane.
-        
-        Args:
-            global_height (int): The window height
-            global_width (int): The window width
-            pane_height (int): Desired pane height
-            pane_width (int): Desired pane width
-            ypos (int): Desired y position
-            xpos (int): Desired x position
-            startscroll (int): Threshold for when the list begins to scroll
-            stdcr (curses window): Standard curses window
-
-        """
-        self.global_width = global_width
-        self.global_height = global_height
-        self.pane_width = pane_width
-        self.pane_height = pane_height
-        self.startscroll = startscroll
-        self.xpos = xpos
-        self.ypos = ypos
-        self.isActive = False
-        self.can_show_position = False
-        self.stdscr = stdscr
-        self.trackpos = 0
-        self.vertpos = 0
-        self.scrolloffset = 0
-        self.current_playing_path = ""
-
-        #create window
-        self.pane = curses.newwin(pane_height, pane_width, ypos, xpos)
-        self.pane.refresh()
-
-    def render(self, track_dicts, selected_track_paths):
-        empty_dict = {  "TITLE":" ",
-                        "PATH": " ",
-                        "TRACKNUMBER": " ",
-                        "LENGTH": " "
-        } #in order to not render bottom row track, causing borders
-        track_dicts.append(empty_dict)
-        i = 0
-        self.pane.erase()
-
-        if (self.vertpos == (self.pane_height - self.startscroll)) and (self.trackpos < (len(track_dicts) - (self.startscroll - 2))):
-            self.scrolloffset += 1
-            self.vertpos -= 1
-
-        if self.scrolloffset > 0 and self.vertpos == (self.startscroll - 2):
-            self.scrolloffset -= 1
-            self.vertpos += 1
-
-        for track in track_dicts:
-            title = track_dicts[i + self.scrolloffset]["TITLE"]
-            trackpath = track_dicts[i + self.scrolloffset]["PATH"]
-            tracknum = track_dicts[i + self.scrolloffset]["TRACKNUMBER"]
-            tracklength = track_dicts[i + self.scrolloffset]["LENGTH"]
-
-            trackIsNowPlaying = trackpath in self.current_playing_path
-
-            if (i + self.scrolloffset) != (len(track_dicts) - 1):
-                tracktime = str(datetime.timedelta(seconds=int(tracklength)))
-            else:
-                tracktime = " "
-
-            space = (4 - len(tracknum)) * " "    
-            title = tracknum + space + title
-
-            if len(title) >= self.pane_width - 9:
-                title = title[:-(len(title) - self.pane_width + 11)]
-                title += ".."
-
-            if self.vertpos == i and self.can_show_position:
-                self.pane.attron(curses.color_pair(3))
-                self.pane.addstr(i + 1, len(title), " " * (self.pane_width - len(title) - 8) + tracktime)
-            elif trackpath in selected_track_paths:
-                self.pane.attron(curses.color_pair(7))
-                self.pane.addstr(i + 1, len(title), " " * (self.pane_width - len(title) - 8) + tracktime)
-            else:
-                if not trackIsNowPlaying:
-                    self.pane.attron(curses.color_pair(2))
-                    self.pane.addstr(i + 1, len(title), " " * (self.pane_width - len(title) - 8) + tracktime)
-                else:
-                    self.pane.attron(curses.color_pair(6))
-                    self.pane.addstr(i + 1, len(title), " " * (self.pane_width - len(title) - 8) + tracktime)
-
-            self.pane.addstr(i + 1, 1, title)
-            self.pane.attroff(curses.color_pair(2))
-
-            i += 1
-
-            if i == self.pane_height - 2:
-                break
-
-        track_dicts.pop()
-       
-        self.render_borders()
-        
-    def activate(self):
-        self.isActive = True
-        self.can_show_position = True
-    
-    def deactivate(self):
-        self.isActive = False
-
-    def keep_showing_position(self):
-        self.can_show_position = True
-
-    def stop_showing_position(self):
-        self.can_show_position = False
-
-    def clear(self):
-        self.vertpos = 0
-        self.trackpos = 0
-        self.scrolloffset = 0
-
-    def refresh(self):
-        self.pane.refresh()
-        tmp = subprocess.run("mpc -f '%file%' | head -1", stdout=subprocess.PIPE, shell=True)
-        self.current_playing_path = str(tmp.stdout.decode('utf-8'))
-
-    def update_dims(self, height, width):
-        self.global_height = height
-        self.global_width = width
-
-    def move_down_one(self, listlength):
-        if (self.trackpos != (listlength - 1)) and self.isActive:
-            self.vertpos += 1
-            self.trackpos += 1
-
-    def move_up_one(self):
-        if (self.trackpos != 0) and self.isActive:
-            self.vertpos -= 1
-            self.trackpos -= 1
-
-    def render_borders(self):
-        self.pane.attron(curses.color_pair(2))
-        if self.ypos > 0:
-            self.pane.border(0,0,0,0,curses.ACS_LTEE,curses.ACS_RTEE,curses.ACS_BTEE,0)
-        elif self.ypos == 0 and self.xpos == 0:
-            self.pane.border(0,0,0,0,0,0,0,0)
-        elif self.ypos == 0 and self.xpos > 0:
-            self.stdscr.addstr(self.ypos, self.xpos, "┬", curses.color_pair(2))
-            self.pane.border(0,0,0,0,curses.ACS_LTEE,0,curses.ACS_BTEE,0)
-
-
-        self.stdscr.refresh()
-        self.stdscr.attron(curses.color_pair(6))
-
-        self.stdscr.addstr(self.ypos, self.xpos + 1, "#")
-        self.stdscr.addstr(self.ypos, self.xpos + 2, "─" * 3, curses.color_pair(2))
-        self.stdscr.addstr(self.ypos, self.xpos + 5, "Title")
-        self.stdscr.addstr(self.ypos, self.xpos + 10, "─" * (self.pane_width - 15), curses.color_pair(2))
-        self.stdscr.addstr(self.ypos, (self.xpos + self.pane_width) - 7, "Length")
-
-        self.stdscr.attroff(curses.color_pair(5))
-
-    def is_track_pane(self):
-        return True
-
 class List_Pane:
     def __init__(self, global_height, global_width, pane_height, pane_width, ypos, xpos, startscroll, stdscr, title):
         self.global_width = global_width
@@ -387,4 +227,144 @@ class List_Pane:
 
     def is_track_pane(self):
         return False
+
+class Track_Pane(List_Pane):
+    def __init__(self, global_height, global_width, pane_height, pane_width, ypos, xpos, startscroll, stdscr):
+        """Initializes a track pane.
+        
+        Args:
+            global_height (int): The window height
+            global_width (int): The window width
+            pane_height (int): Desired pane height
+            pane_width (int): Desired pane width
+            ypos (int): Desired y position
+            xpos (int): Desired x position
+            startscroll (int): Threshold for when the list begins to scroll
+            stdcr (curses window): Standard curses window
+
+        """
+        self.global_width = global_width
+        self.global_height = global_height
+        self.pane_width = pane_width
+        self.pane_height = pane_height
+        self.startscroll = startscroll
+        self.xpos = xpos
+        self.ypos = ypos
+        self.isActive = False
+        self.can_show_position = False
+        self.stdscr = stdscr
+        self.trackpos = 0 #unique to this class
+        self.selectedpos = 0
+        self.vertpos = 0
+        self.scrolloffset = 0
+        self.current_playing_path = "" #unique to this class
+
+        #create window
+        self.pane = curses.newwin(pane_height, pane_width, ypos, xpos)
+        self.pane.refresh()
+
+    def render(self, track_dicts, selected_track_paths):
+        empty_dict = {  "TITLE":" ",
+                        "PATH": " ",
+                        "TRACKNUMBER": " ",
+                        "LENGTH": " "
+        } #in order to not render bottom row track, causing borders
+        track_dicts.append(empty_dict)
+        i = 0
+        self.pane.erase()
+
+        if (self.vertpos == (self.pane_height - self.startscroll)) and (self.selectedpos < (len(track_dicts) - (self.startscroll - 2))):
+            self.scrolloffset += 1
+            self.vertpos -= 1
+
+        if self.scrolloffset > 0 and self.vertpos == (self.startscroll - 2):
+            self.scrolloffset -= 1
+            self.vertpos += 1
+
+        for track in track_dicts:
+            title = track_dicts[i + self.scrolloffset]["TITLE"]
+            trackpath = track_dicts[i + self.scrolloffset]["PATH"]
+            tracknum = track_dicts[i + self.scrolloffset]["TRACKNUMBER"]
+            tracklength = track_dicts[i + self.scrolloffset]["LENGTH"]
+
+            trackIsNowPlaying = trackpath in self.current_playing_path
+
+            if (i + self.scrolloffset) != (len(track_dicts) - 1):
+                tracktime = str(datetime.timedelta(seconds=int(tracklength)))
+            else:
+                tracktime = " "
+
+            space = (4 - len(tracknum)) * " "    
+            title = tracknum + space + title
+
+            if len(title) >= self.pane_width - 9:
+                title = title[:-(len(title) - self.pane_width + 11)]
+                title += ".."
+
+            if self.vertpos == i and self.can_show_position:
+                self.pane.attron(curses.color_pair(3))
+                self.pane.addstr(i + 1, len(title), " " * (self.pane_width - len(title) - 8) + tracktime)
+            elif trackpath in selected_track_paths:
+                self.pane.attron(curses.color_pair(7))
+                self.pane.addstr(i + 1, len(title), " " * (self.pane_width - len(title) - 8) + tracktime)
+            else:
+                if not trackIsNowPlaying:
+                    self.pane.attron(curses.color_pair(2))
+                    self.pane.addstr(i + 1, len(title), " " * (self.pane_width - len(title) - 8) + tracktime)
+                else:
+                    self.pane.attron(curses.color_pair(6))
+                    self.pane.addstr(i + 1, len(title), " " * (self.pane_width - len(title) - 8) + tracktime)
+
+            self.pane.addstr(i + 1, 1, title)
+            self.pane.attroff(curses.color_pair(2))
+
+            i += 1
+
+            if i == self.pane_height - 2:
+                break
+
+        track_dicts.pop()
+       
+        self.render_borders()
+        
+    def activate(self):
+        self.isActive = True
+        self.can_show_position = True
+    
+    def clear(self):
+        self.vertpos = 0
+        self.selectedpos = 0
+        self.scrolloffset = 0
+
+    def refresh(self):
+        self.pane.refresh()
+        tmp = subprocess.run("mpc -f '%file%' | head -1", stdout=subprocess.PIPE, shell=True)
+        self.current_playing_path = str(tmp.stdout.decode('utf-8'))
+
+    def render_borders(self):
+        self.pane.attron(curses.color_pair(2))
+        if self.ypos > 0:
+            self.pane.border(0,0,0,0,curses.ACS_LTEE,curses.ACS_RTEE,curses.ACS_BTEE,0)
+        elif self.ypos == 0 and self.xpos == 0:
+            self.pane.border(0,0,0,0,0,0,0,0)
+        elif self.ypos == 0 and self.xpos > 0:
+            self.stdscr.addstr(self.ypos, self.xpos, "┬", curses.color_pair(2))
+            self.pane.border(0,0,0,0,curses.ACS_LTEE,0,curses.ACS_BTEE,0)
+
+
+        self.stdscr.refresh()
+        self.stdscr.attron(curses.color_pair(6))
+
+        self.stdscr.addstr(self.ypos, self.xpos + 1, "#")
+        self.stdscr.addstr(self.ypos, self.xpos + 2, "─" * 3, curses.color_pair(2))
+        self.stdscr.addstr(self.ypos, self.xpos + 5, "Title")
+        self.stdscr.addstr(self.ypos, self.xpos + 10, "─" * (self.pane_width - 15), curses.color_pair(2))
+        self.stdscr.addstr(self.ypos, (self.xpos + self.pane_width) - 7, "Length")
+
+        self.stdscr.attroff(curses.color_pair(5))
+
+    def is_track_pane(self):
+        return True
+
+
 

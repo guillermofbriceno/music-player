@@ -243,7 +243,7 @@ class Tab:
     def select_track(self):
         if self.isActive:
             if self.panes[self.current_pane].is_track_pane():
-                path = self.filtered_tracks[self.panes[self.current_pane].trackpos]["PATH"]
+                path = self.filtered_tracks[self.panes[self.current_pane].selectedpos]["PATH"]
                 if path in self.selected_tracks:
                     self.selected_tracks.remove(path)
                     self.move_down()
@@ -295,7 +295,7 @@ class Tab:
                     client.add(track["PATH"])
 
                 subprocess.call(["mpc", "play", 
-                    str(self.panes[len(self.panes) - 1].trackpos + 1)], stdout=subprocess.PIPE)
+                    str(self.panes[len(self.panes) - 1].selectedpos + 1)], stdout=subprocess.PIPE)
             except CommandError as e:
                 height, width = self.stdscr.getmaxyx()
                 status_bar.set_bar_string("MPD Error: " + str(e))
