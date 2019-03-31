@@ -253,7 +253,6 @@ class Track_Pane(List_Pane):
         self.isActive = False
         self.can_show_position = False
         self.stdscr = stdscr
-        self.trackpos = 0 #unique to this class
         self.selectedpos = 0
         self.vertpos = 0
         self.scrolloffset = 0

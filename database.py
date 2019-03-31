@@ -209,4 +209,4 @@ class Playlists:
                         track_path = track_path.rstrip("\n\r")
                         tmp_tagdict = next(track for track in self.database.dict_list if track["PATH"] == track_path)
                         tmp_tagdict["PLAYLIST"] = playlist_file_name
-                        self.playlist_dict_list.append(tmp_tagdict)
+                        self.playlist_dict_list.append(tmp_tagdict.copy())

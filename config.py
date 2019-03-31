@@ -18,7 +18,9 @@ mvmt_keys = {
             's': 'shuffle',
             'f': 'search_mode',
             '\x1b': 'reset_tab',
-            ' ': 'select_track'
+            ' ': 'select_track',
+            'm': 'add_to_playlist_pane',
+            '\n': 'add_to_playlist'
             }
 
 #Interface configuration

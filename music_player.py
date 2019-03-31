@@ -70,6 +70,7 @@ def member_func(f, obj_list):
 def main():
     os.environ.setdefault('ESCDELAY', '25')
     curses.wrapper(start_player)
+    #database = start_database(db_dir, playlists_dir)
 
 if __name__ == "__main__":
     main()

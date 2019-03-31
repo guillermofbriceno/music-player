@@ -24,6 +24,7 @@ class Tab:
         self.status_bar = status_bar
         self.do_not_overwrite = False
         self.selected_tracks = []
+        self.in_add_to_playlist_mode = False
 
         if config_type == "SINGLE":
             self.create_single_pane(config_attr)
@@ -37,6 +38,53 @@ class Tab:
             self.create_playlist_tab(config_attr)
         else:
             raise ValueError("Invalid config type")
+
+    def add_to_playlist_pane(self):
+        self.temp_vars = [self.attr_keys, self.attr_values, self.main_filter, self.exclude_filter, self.pane_titles]
+        self.temp_panes = self.panes
+        self.attr_keys = ["PLAYLIST"]
+        self.attr_values = ["Empty"]
+        self.main_filter = ["PLAYLISTS", None]
+        self.exclude_filter = [None, None]
+        self.pane_titles = ["Playlist"]
+       
+        self.filtered_tracks = self.database.get_all_tracks_with("PLAYLISTS", None, None, None)
+
+        pane = List_Pane(self.window_dims[0], self.window_dims[1], #main window dims
+                self.window_dims[0] - 1, 30, #height and width of pane
+                0, 0, #y and x position of top left corner of pane
+                self.scrll_start, self.stdscr, self.pane_titles[0])
+
+        self.in_add_to_playlist_mode = True
+
+        pane.activate()
+        self.panes = [pane]
+        self.refresh_panes()
+        self.populate_lists()
+
+    def add_to_playlist(self):
+        if self.in_add_to_playlist_mode:
+            selected_file = self.attr_values[0][self.panes[0].selectedpos] + ".m3u"
+            with open(playlists_dir + "/" + selected_file, 'a') as f:
+                for path in self.selected_tracks:
+                    f.write(path)
+                    f.write('\n')
+            
+            self.attr_keys, self.attr_values, self.main_filter, self.exclude_filter, self.pane_titles = self.temp_vars
+            self.panes = self.temp_panes
+            self.panes[0].activate()
+            self.refresh_panes()
+
+            new_tracks = self.database.get_all_tracks_with("PATH", self.selected_tracks, None, None).copy()
+            for track in new_tracks:
+                track["PLAYLIST"] = selected_file[:-4]
+                self.database.playlists.playlist_dict_list.append(track.copy())
+
+            del new_tracks
+            #playlists = Playlists(playlists_dir, db_dir, self.database)
+            #self.database.add_playlists(playlists)
+
+            self.in_add_to_playlist_mode = False
 
     def create_2_pane(self, config_attr):
         self.window_dims[0], self.window_dims[1], self.main_filter, self.exclude_filter, self.attr_keys, self.pane_titles = config_attr
