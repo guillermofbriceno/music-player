@@ -72,7 +72,6 @@ class Tab:
             
             self.attr_keys, self.attr_values, self.main_filter, self.exclude_filter, self.pane_titles = self.temp_vars
             self.panes = self.temp_panes
-            self.panes[0].activate()
             self.refresh_panes()
 
             new_tracks = self.database.get_all_tracks_with("PATH", self.selected_tracks, None, None).copy()
@@ -81,8 +80,6 @@ class Tab:
                 self.database.playlists.playlist_dict_list.append(track.copy())
 
             del new_tracks
-            #playlists = Playlists(playlists_dir, db_dir, self.database)
-            #self.database.add_playlists(playlists)
 
             self.in_add_to_playlist_mode = False
 

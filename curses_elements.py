@@ -98,7 +98,7 @@ class Status_Bar:
 
     def create_tab_string(self):
         string = ""
-        for tab in range(1, self.number_of_tabs):
+        for tab in range(1, self.number_of_tabs + 1):
             if tab == self.current_tab:
                 string += " [" + str(tab) + "] "
             else:

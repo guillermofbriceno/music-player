@@ -46,7 +46,7 @@ def start_player(stdscr):
 
         if k in mvmt_keys:
             member_func(mvmt_keys[k], tabs)
-        elif k in number_keys and int(chr(k)) < len(tabs):
+        elif k in number_keys and (int(chr(k)) - 1) < len(tabs):
             tabs[current_tab].deactivate_tab()
             current_tab = int(chr(k)) - 1
             tabs[current_tab].activate_tab()
