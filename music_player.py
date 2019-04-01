@@ -25,6 +25,7 @@ def start_player(stdscr):
     database = start_database(db_dir, playlists_dir)
 
     status_bar = Status_Bar("Welcome!", stdscr, height, width)
+    seek_bar = Seek_Bar(stdscr, height - 1, width)
 
     tabs = []
     for tabconf in tabs_config:
@@ -39,11 +40,13 @@ def start_player(stdscr):
     status_bar.set_number_of_tabs(len(tabs))
 
     curses.halfdelay(15)
+    curses.mousemask(1)
     k = 100
     current_tab = 0
 
     while(k != ord('q')):
         status_bar.render_bar()
+        seek_bar.draw()
 
         if k in mvmt_keys:
             member_func(mvmt_keys[k], tabs)
@@ -54,6 +57,7 @@ def start_player(stdscr):
             stdscr.erase()
             status_bar.set_current_tab(current_tab + 1)
             status_bar.render_bar()
+            seek_bar.draw()
 
         for tab in tabs:
             tab.render_all_panes(k is not curses.ERR)
@@ -62,6 +66,12 @@ def start_player(stdscr):
         status_bar.set_bar_string("DEFAULT")
 
         k = stdscr.getch()
+        if k == curses.KEY_MOUSE:
+            mouse_event = curses.getmouse()
+            _, x, y, _, _ = mouse_event
+            status_bar.set_bar_string(str(x) + " " + str(y))
+            seek_bar.seek(mouse_event)
+            
 
 def member_func(f, obj_list):
     for obj in obj_list:

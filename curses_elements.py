@@ -39,6 +39,45 @@ def seconds_to_minutes(seconds):
 def norm(size, string):
     return " " * (size - len(string)) + string
 
+class Seek_Bar:
+    def __init__(self, stdscr, ypos, width):
+        self.stdscr = stdscr
+        self.ypos = ypos
+        self.width = width
+
+    def draw(self):
+        elapsed_time, duration = self.get_track_times()
+        characters_elapsed =  int(round((self.width * elapsed_time) / duration))
+
+        self.stdscr.attron(curses.color_pair(8))
+        self.stdscr.addstr(self.ypos - 1, 0, " " * characters_elapsed)
+        self.stdscr.attroff(curses.color_pair(8))
+        self.stdscr.attron(curses.color_pair(2))
+        self.stdscr.addstr(self.ypos - 1, characters_elapsed, " " * (self.width - characters_elapsed))
+        self.stdscr.attroff(curses.color_pair(2))
+
+    def seek(self, mouse_event):
+        _, mousex, mousey, _, _ = mouse_event
+
+        if mousey == self.ypos - 1:
+            elapsed_time, duration = self.get_track_times()
+            seconds_to_seek = (duration * mousex) / self.width
+            client = start_mpd_client()
+            client.seekcur(seconds_to_seek)
+
+    def get_track_times(self):
+        client = start_mpd_client()
+        status = client.status()
+
+        if "elapsed" in status:
+            elapsed_time = float(status["elapsed"])
+            duration = float(status["duration"])
+            stop_mpd_client(client)
+            return [elapsed_time, duration]
+        else:
+            stop_mpd_client(client)
+            return [0, 1]
+
 class Status_Bar:
     def __init__(self, first_string, stdscr, ypos, width):
         self.bar_string = ""
@@ -60,6 +99,10 @@ class Status_Bar:
             pass
         else:
             self.bar_string = string
+        if string == "DEBUG":
+            curses.mousemask(1)
+            test = curses.getmouse()
+            self.bar_string = test[0] + ", " + test[1]
 
     
     def render_bar(self):
@@ -72,15 +115,27 @@ class Status_Bar:
             time = elapsed_time + "/" + duration
             audio = status["audio"]
             bitrate = status["bitrate"]
+            random = status["random"]
+            if random == '0':
+                random = " "
+            else:
+                random = "  |  shuffle  "
         else:
             time = " "
             audio = " "
             bitrate = " "
+            random = " "
             
         playlistlength = norm(4, status["playlistlength"])
         info_string = norm(20, "[" + audio + " @ " + bitrate + "kbps" + "]")
-        left_aligned = self.bar_string + "  |  " + info_string
-        right_aligned =  time + " | " + playlistlength + " Tracks Queued  | " + state + " | " + self.create_tab_string()
+        right_aligned =  time + " | " + playlistlength + " Tracks Queued  | " + state + random + " | " + self.create_tab_string()
+
+        if (len(info_string) + len(self.bar_string) + 10) >= (self.width - len(right_aligned)):
+            left_aligned = self.bar_string[:-((len(info_string) + len(self.bar_string)) - (self.width - len(right_aligned)) + 10)]
+            left_aligned += ".. |  " + info_string
+        else:
+            left_aligned = self.bar_string + "  |  " + info_string
+
         full_string = left_aligned + " " * (self.width - (len(right_aligned) + len(left_aligned)) - 3) + right_aligned
 
         self.stdscr.addstr(self.ypos - 1, 0, full_string)

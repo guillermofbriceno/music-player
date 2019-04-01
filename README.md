@@ -3,4 +3,4 @@ Terminal based music player UI for MPC.
 
 ## Screenshots
 Complex interface customization
-![Alt text](https://files.catbox.moe/43y673 "Interface configuration 2")
+![Alt text](https://www.emptytincan.com/i/g/1554147751-MOTgh.png "Interface configuration 2")

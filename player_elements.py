@@ -26,6 +26,8 @@ class Tab:
         self.selected_tracks = []
         self.in_add_to_playlist_mode = False
 
+        self.height_offset = 2
+
         if config_type == "SINGLE":
             self.create_single_pane(config_attr)
         elif config_type == "4-PANE":
@@ -52,7 +54,7 @@ class Tab:
         self.reset_tab()
 
         pane = List_Pane(self.window_dims[0], self.window_dims[1], #main window dims
-                self.window_dims[0] - 1, 30, #height and width of pane
+                self.window_dims[0] - self.height_offset, 30, #height and width of pane
                 0, 0, #y and x position of top left corner of pane
                 self.scrll_start, self.stdscr, self.pane_titles[0])
 
@@ -91,7 +93,7 @@ class Tab:
                 self.exclude_filter[0], self.exclude_filter[1])
 
         pane1 = List_Pane(self.window_dims[0], self.window_dims[1], #main window dims
-                self.window_dims[0] - 1, 30, #height and width of pane
+                self.window_dims[0] - self.height_offset, 30, #height and width of pane
                 0, 0, #y and x position of top left corner of pane
                 self.scrll_start, self.stdscr, self.pane_titles[0])
 
@@ -116,12 +118,12 @@ class Tab:
         self.filtered_tracks = self.database.get_all_tracks_with("PLAYLISTS", None, None, None)
 
         pane1 = List_Pane(self.window_dims[0], self.window_dims[1], #main window dims
-                self.window_dims[0] - 1, 30, #height and width of pane
+                self.window_dims[0] - self.height_offset, 30, #height and width of pane
                 0, 0, #y and x position of top left corner of pane
                 self.scrll_start, self.stdscr, self.pane_titles[0])
 
         pane2 = Track_Pane(self.window_dims[0], self.window_dims[1], 
-                self.window_dims[0] - 1, self.window_dims[1] - 29, 
+                self.window_dims[0] - self.height_offset, self.window_dims[1] - 29, 
                 0, 29, 
                 self.scrll_start, self.stdscr)
 
@@ -136,12 +138,12 @@ class Tab:
                 self.exclude_filter[0], self.exclude_filter[1])
 
         pane1 = List_Pane(self.window_dims[0], self.window_dims[1], #main window dims
-                self.window_dims[0] - 1, 30, #height and width of pane
+                self.window_dims[0] - self.height_offset, 30, #height and width of pane
                 0, 0, #y and x position of top left corner of pane
                 self.scrll_start, self.stdscr, self.pane_titles[0])
 
         pane2 = List_Pane(self.window_dims[0], self.window_dims[1], 
-                self.window_dims[0] - 1, 60, 
+                self.window_dims[0] - self.height_offset, 60, 
                 0, 29, 
                 self.scrll_start, self.stdscr, self.pane_titles[1])
 
@@ -151,7 +153,7 @@ class Tab:
                 self.scrll_start, self.stdscr, self.pane_titles[2])
 
         pane4 = Track_Pane(self.window_dims[0], self.window_dims[1], 
-                self.window_dims[0] - 9, self.window_dims[1] - 88, 
+                self.window_dims[0] - 8 - self.height_offset, self.window_dims[1] - 88, 
                 8, 88, 
                 self.scrll_start, self.stdscr)
 
@@ -166,17 +168,17 @@ class Tab:
                 self.exclude_filter[0], self.exclude_filter[1])
 
         pane1 = List_Pane(self.window_dims[0], self.window_dims[1], #main window dims
-                self.window_dims[0] - 1, 30, #height and width of pane
+                self.window_dims[0] - self.height_offset, 30, #height and width of pane
                 0, 0, #y and x position of top left corner of pane
                 self.scrll_start, self.stdscr, self.pane_titles[0])
 
         pane2 = List_Pane(self.window_dims[0], self.window_dims[1], 
-                self.window_dims[0] - 1, 60, 
+                self.window_dims[0] - self.height_offset, 60, 
                 0, 29, 
                 self.scrll_start, self.stdscr, self.pane_titles[1])
 
         pane3 = Track_Pane(self.window_dims[0], self.window_dims[1], 
-                self.window_dims[0] - 1, self.window_dims[1] - 88, 
+                self.window_dims[0] - self.height_offset, self.window_dims[1] - 88, 
                 0, 88, 
                 self.scrll_start, self.stdscr)
 
@@ -191,7 +193,7 @@ class Tab:
 
         self.attr_keys.append("TRACK")
         self.attr_values.append("Empty")
-        pane = Track_Pane(self.window_dims[0], self.window_dims[1], self.window_dims[0] - 1, self.window_dims[1], 0, 0, self.scrll_start, self.stdscr)
+        pane = Track_Pane(self.window_dims[0], self.window_dims[1], self.window_dims[0] - self.height_offset, self.window_dims[1], 0, 0, self.scrll_start, self.stdscr)
         pane.refresh()
         pane.activate()
         self.panes.append(pane)
@@ -362,8 +364,8 @@ class Tab:
 
             stop_mpd_client(client)
 
-    def shuffle(self):
+    def toggle_random(self):
         if self.isActive:
             client = start_mpd_client()
-            client.shuffle()
+            client.random(int(not bool(int(client.status()["random"]))))
             stop_mpd_client(client)
