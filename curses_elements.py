@@ -52,10 +52,10 @@ class Seek_Bar:
         self.stdscr.attron(curses.color_pair(8))
         self.stdscr.addstr(self.ypos - 1, 0, " " * characters_elapsed)
         self.stdscr.attroff(curses.color_pair(8))
-        self.stdscr.attron(curses.color_pair(7))
+        self.stdscr.attron(curses.color_pair(2))
         if not self.width == characters_elapsed:
             self.stdscr.addstr(self.ypos - 1, characters_elapsed, " " * (self.width - characters_elapsed))
-        self.stdscr.attroff(curses.color_pair(7))
+        self.stdscr.attroff(curses.color_pair(2))
 
     def seek(self, mouse_event):
         _, mousex, mousey, _, _ = mouse_event

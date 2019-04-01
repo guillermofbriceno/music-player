@@ -67,10 +67,14 @@ def start_player(stdscr):
 
         k = stdscr.getch()
         if k == curses.KEY_MOUSE:
-            mouse_event = curses.getmouse()
-            _, x, y, _, _ = mouse_event
-            status_bar.set_bar_string(str(x) + " " + str(y))
-            seek_bar.seek(mouse_event)
+            try:
+                mouse_event = curses.getmouse()
+            except:
+                pass
+            else:
+                _, x, y, _, _ = mouse_event
+                status_bar.set_bar_string(str(x) + " " + str(y))
+                seek_bar.seek(mouse_event)
             
 
 def member_func(f, obj_list):
