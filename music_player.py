@@ -8,6 +8,7 @@ from subprocess import call
 import subprocess
 import time
 from operator import methodcaller
+import logging
 
 from database import *
 from player_elements import *
@@ -68,6 +69,7 @@ def member_func(f, obj_list):
         func(obj)
 
 def main():
+    logging.basicConfig(filename='log',level=logging.DEBUG)
     os.environ.setdefault('ESCDELAY', '25')
     curses.wrapper(start_player)
     #database = start_database(db_dir, playlists_dir)

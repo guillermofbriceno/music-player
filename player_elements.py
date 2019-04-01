@@ -49,6 +49,7 @@ class Tab:
         self.pane_titles = ["Playlist"]
        
         self.filtered_tracks = self.database.get_all_tracks_with("PLAYLISTS", None, None, None)
+        self.reset_tab()
 
         pane = List_Pane(self.window_dims[0], self.window_dims[1], #main window dims
                 self.window_dims[0] - 1, 30, #height and width of pane
@@ -247,6 +248,19 @@ class Tab:
                     pane.move_down_one(len(l))
                 else:
                     pane.move_down_one(len(self.filtered_tracks))
+
+    def skip_down_pane(self):
+        if self.isActive:
+            for pane, l in zip(self.panes, self.attr_values):
+                if not pane.is_track_pane():
+                    pane.skip_down(len(l))
+                else:
+                    pane.skip_down(len(self.filtered_tracks))
+
+    def skip_up_pane(self):
+        if self.isActive:
+            for pane in self.panes:
+                pane.skip_up()
 
     def move_left(self):
         if not self.current_pane == 0 and self.isActive and not self.do_not_overwrite:

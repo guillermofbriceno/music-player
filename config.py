@@ -20,7 +20,9 @@ mvmt_keys = {
             '\x1b': 'reset_tab',
             ' ': 'select_track',
             'm': 'add_to_playlist_pane',
-            '\n': 'add_to_playlist'
+            '\n': 'add_to_playlist',
+            '.': 'skip_down_pane',
+            ',': 'skip_up_pane'
             }
 
 #Interface configuration
@@ -68,7 +70,7 @@ tabs_config = [
                 'include-only': ["PLAYLISTS", None],
                 'exclude': [None, None],
                 'filter-keys': ["PLAYLIST", "GENRE", "TRACK"],
-                'pane-titles': ["Playlist", "GENRE", None]
+                'pane-titles': ["Playlist", "Genre", None]
             }
         ]
 
