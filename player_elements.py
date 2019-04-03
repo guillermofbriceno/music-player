@@ -49,9 +49,8 @@ class Tab:
         self.main_filter = ["PLAYLISTS", None]
         self.exclude_filter = [None, None]
         self.pane_titles = ["Playlist"]
-       
+
         self.filtered_tracks = self.database.get_all_tracks_with("PLAYLISTS", None, None, None)
-        self.reset_tab()
 
         pane = List_Pane(self.window_dims[0], self.window_dims[1], #main window dims
                 self.window_dims[0] - self.height_offset, 30, #height and width of pane
@@ -60,10 +59,12 @@ class Tab:
 
         self.in_add_to_playlist_mode = True
 
+        pane.selectedpos = 0
         pane.activate()
         self.panes = [pane]
         self.refresh_panes()
         self.populate_lists()
+        self.reset_tab()
 
     def add_to_playlist(self):
         if self.in_add_to_playlist_mode:

@@ -39,7 +39,7 @@ def start_player(stdscr):
    
     status_bar.set_number_of_tabs(len(tabs))
 
-    curses.halfdelay(15)
+    curses.halfdelay(ui_config["refresh-delay"])
     curses.mousemask(1)
     k = 100
     current_tab = 0
@@ -73,7 +73,6 @@ def start_player(stdscr):
                 pass
             else:
                 _, x, y, _, _ = mouse_event
-                status_bar.set_bar_string(str(x) + " " + str(y))
                 seek_bar.seek(mouse_event)
             
 

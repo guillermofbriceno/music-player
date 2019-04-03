@@ -92,19 +92,9 @@ class Status_Bar:
     def set_bar_string(self, string):
         if string == "DEFAULT":
             track = mpd_get_current_playing()
-            if "title" in track:
-                str1 = track["title"]
-            else:
-                str1 = "No Track"
-            self.bar_string = str1
-            pass
+            self.bar_string = track.get("title") or "No Track"
         else:
             self.bar_string = string
-        if string == "DEBUG":
-            curses.mousemask(1)
-            test = curses.getmouse()
-            self.bar_string = test[0] + ", " + test[1]
-
     
     def render_bar(self):
         self.stdscr.attron(curses.color_pair(5))
@@ -114,22 +104,16 @@ class Status_Bar:
             elapsed_time = seconds_to_minutes(round(float(status["elapsed"])))
             duration = seconds_to_minutes(round(float(status["duration"])))
             time = elapsed_time + "/" + duration
-            audio = status["audio"]
-            bitrate = status["bitrate"]
-            random = status["random"]
-            if random == '0':
-                random = " "
-            else:
-                random = "  |  shuffle  "
         else:
             time = " "
-            audio = " "
-            bitrate = " "
-            random = " "
+
+        audio = status.get("audio") or " "
+        bitrate = status.get("bitrate") or " "
+        random = " " if status.get("random") is '0' else "  |  shuffle  "
             
         playlistlength = norm(4, status["playlistlength"])
-        info_string = norm(20, "[" + audio + " @ " + bitrate + "kbps" + "]")
-        right_aligned =  time + " | " + playlistlength + " Tracks Queued  | " + state + random + " | " + self.create_tab_string()
+        info_string = norm(20, ''.join(["[", audio, " @ ", bitrate, "kbps", "]")])
+        right_aligned =  ''.join([time, " | ", playlistlength, " Tracks Queued  | ", state, random, " | ", self.create_tab_string()])
 
         if (len(info_string) + len(self.bar_string) + 10) >= (self.width - len(right_aligned)):
             left_aligned = self.bar_string[:-((len(info_string) + len(self.bar_string)) - (self.width - len(right_aligned)) + 10)]
@@ -137,7 +121,7 @@ class Status_Bar:
         else:
             left_aligned = self.bar_string + "  |  " + info_string
 
-        full_string = left_aligned + " " * (self.width - (len(right_aligned) + len(left_aligned)) - 3) + right_aligned
+        full_string = ''.join([left_aligned, " " * (self.width - (len(right_aligned) + len(left_aligned)) - 3), right_aligned])
 
         self.stdscr.addstr(self.ypos - 1, 0, full_string)
         self.stdscr.addstr(self.ypos - 1, len(full_string), " " * (self.width - len(full_string) - 1))
