@@ -5,6 +5,8 @@ import pickle
 from fractions import Fraction
 from functools import reduce
 import re
+from config import *
+import logging
 
 def tryint(s):
     try:
@@ -54,18 +56,23 @@ def get_tracks_with(dict_list, attrkey, attrvalue):
                 if any(val in track[attrkey] for val in attrvalue)]
 
 
+def dump_database(database):
+    database_name = db_dir[0][db_dir[0].rfind("/") + 1:] + "-db"
+    db_file = open(install_dir + "/" + database_name, 'wb')
+    pickle.dump(database, db_file)
+
 def start_database(directory_strs, playlists_dir):
     database_name = directory_strs[0][directory_strs[0].rfind("/") + 1:] + "-db"
     if database_file_already_exists(database_name):
-        db_file = open(database_name, 'rb')
+        db_file = open(install_dir + "/" + database_name, 'rb')
         database = pickle.load(db_file)
-        playlists = Playlists(playlists_dir, directory_strs, database)
-        database.add_playlists(playlists)
+        #playlists = Playlists(playlists_dir, directory_strs, database)
+        #database.add_playlists(playlists)
         return database
     else:
         print("Database file not found, creating one...")
         database = Database(directory_strs)
-        db_file = open(database_name, 'wb')
+        db_file = open(install_dir + "/" + database_name, 'wb')
         pickle.dump(database, db_file)
         playlists = Playlists(playlists_dir, directory_strs, database)
         database.add_playlists(playlists)
@@ -77,7 +84,7 @@ def database_file_already_exists(file_name):
         file_name (str): The name of the file in the running directory.
     Returns:
         bool: Whether or not the file was found"""
-    return os.path.isfile(os.getcwd() + "/" + file_name)
+    return os.path.isfile(install_dir + "/" + file_name)
 
 def cut_brackets(tag):
         string = str(tag)
@@ -125,6 +132,54 @@ class Database:
             for path in pathlist_gen:
                 tmp_tagdict = create_track(path, dir_str)
                 self.dict_list.append(tmp_tagdict)
+
+    def delete_tracks_from_database(self, path_list):
+        tracks_to_remove = get_tracks_with(self.dict_list, "PATH", path_list)
+        for track in tracks_to_remove:
+            for path in path_list: # in case get_tracks_with found substrings that we didn't want removed like matching pieces of directories 
+                if track["PATH"] == path:
+                    self.dict_list.remove(track)
+
+        dump_database(self)
+
+    def add_tracks_from_dir(self, folder_directory):
+        mask = r'**/*.[mf][pl][3a]*'
+        pathlist_gen = Path(folder_directory).glob(mask)
+        tracklist = []
+        for path in pathlist_gen:
+            tmp_tagdict = create_track(path, db_dir[0])
+            tracklist.append(tmp_tagdict)
+
+        if len(get_tracks_with(self.dict_list, "PATH", [tracklist[0]["PATH"]])) > 0:
+            print("Tracks already exist in database.")
+            return False
+        else:
+            for track in tracklist:
+                self.dict_list.append(track)
+
+            self.sort_tracks("NORMAL")
+            return True
+
+    def update_tracks_from_dir(self, folder_directory):
+        mask = r'**/*.[mf][pl][3a]*'
+        pathlist_gen = Path(folder_directory).glob(mask)
+        tracklist = []
+        for path in pathlist_gen:
+            tmp_tagdict = create_track(path, db_dir[0])
+            tracklist.append(tmp_tagdict)
+
+        full_sample_track_path = tracklist[0]["PATH"]
+        index = full_sample_track_path.rfind('/')
+        no_track_path = full_sample_track_path[:-(len(full_sample_track_path) - index)]
+        tracks_to_remove = get_tracks_with(self.dict_list, "PATH", [no_track_path])
+        for track in tracks_to_remove:
+            self.dict_list.remove(track)
+
+        for track in tracklist:
+            print("Updating: ", track["PATH"])
+            self.dict_list.append(track)
+
+        self.sort_tracks("NORMAL")
 
     def sort_tracks(self, method):
         if method == "NORMAL":
@@ -207,6 +262,7 @@ class Playlists:
                 for track_path in playlist:
                     if not track_path == '\n':
                         track_path = track_path.rstrip("\n\r")
+                        logging.debug(track_path)
                         tmp_tagdict = next(track for track in self.database.dict_list if track["PATH"] == track_path)
                         tmp_tagdict["PLAYLIST"] = playlist_file_name
                         self.playlist_dict_list.append(tmp_tagdict.copy())

@@ -112,7 +112,7 @@ class Status_Bar:
         random = " " if status.get("random") is '0' else "  |  shuffle  "
             
         playlistlength = norm(4, status["playlistlength"])
-        info_string = norm(20, ''.join(["[", audio, " @ ", bitrate, "kbps", "]")])
+        info_string = norm(20, ''.join(["[", audio, " @ ", bitrate, "kbps", "]"]))
         right_aligned =  ''.join([time, " | ", playlistlength, " Tracks Queued  | ", state, random, " | ", self.create_tab_string()])
 
         if (len(info_string) + len(self.bar_string) + 10) >= (self.width - len(right_aligned)):

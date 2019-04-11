@@ -315,6 +315,20 @@ class Tab:
             else:
                 self.selected_tracks += [track["PATH"] for track in self.filtered_tracks]
 
+    def remove_tracks(self):
+        if self.isActive:
+            curses.cbreak()
+            k = 100
+            self.status_bar.set_bar_string("Are you sure? (y/n)")
+            self.status_bar.render_bar()
+            k = self.stdscr.getch()
+            if k == ord('y'):
+                self.database.delete_tracks_from_database(self.selected_tracks)
+
+            curses.halfdelay(15)
+            self.status_bar.set_bar_string("DEFAULT")
+            self.status_bar.render_bar()
+
     def search_mode(self):
         if self.isActive:
             curses.cbreak()
@@ -360,7 +374,7 @@ class Tab:
                     str(self.panes[len(self.panes) - 1].selectedpos + 1)], stdout=subprocess.PIPE)
             except CommandError as e:
                 height, width = self.stdscr.getmaxyx()
-                status_bar.set_bar_string("MPD Error: " + str(e))
+                self.status_bar.set_bar_string("MPD Error: " + str(e))
 
 
             stop_mpd_client(client)

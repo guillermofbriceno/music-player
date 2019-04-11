@@ -3,7 +3,9 @@ import curses
 
 #Database directory. Must match MPD music directories (multiple dirs not supported by MPD anyway)
 db_dir = ["/home/guillermo/bach/Music/all-music"]
+#db_dir = ["/home/guillermo/programming/music-player/test-music"]
 playlists_dir = "/home/guillermo/programming/music-player/playlists"
+install_dir = "/home/guillermo/programming/music-player"
 
 #Keybindings
 number_keys = [ord(str(num)) for num in range(9)]
@@ -22,7 +24,8 @@ mvmt_keys = {
             'm': 'add_to_playlist_pane',
             '\n': 'add_to_playlist',
             '.': 'skip_down_pane',
-            ',': 'skip_up_pane'
+            ',': 'skip_up_pane',
+            'r': 'remove_tracks'
             }
 
 #Interface configuration
