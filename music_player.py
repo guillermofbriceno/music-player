@@ -24,7 +24,11 @@ def start_player(stdscr):
     height, width = stdscr.getmaxyx()
     database = start_database(db_dir, playlists_dir)
 
-    status_bar = Status_Bar("Welcome!", stdscr, height, width)
+    tracktime = database.get_total_track_time()
+
+    #status_bar = Status_Bar("Welcome!", stdscr, height, width)
+    status_bar = Status_Bar(str(tracktime), stdscr, height, width)
+
     seek_bar = Seek_Bar(stdscr, height - 1, width)
 
     tabs = []

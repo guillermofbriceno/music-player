@@ -66,8 +66,8 @@ def start_database(directory_strs, playlists_dir):
     if database_file_already_exists(database_name):
         db_file = open(install_dir + "/" + database_name, 'rb')
         database = pickle.load(db_file)
-        #playlists = Playlists(playlists_dir, directory_strs, database)
-        #database.add_playlists(playlists)
+        playlists = Playlists(playlists_dir, directory_strs, database)
+        database.add_playlists(playlists)
         return database
     else:
         print("Database file not found, creating one...")
@@ -196,6 +196,14 @@ class Database:
         for track in self.dict_list:
             if path in track["PATH"]:
                 return track
+
+    def get_total_track_time(self):
+        tracktime = 0
+        for track in self.dict_list:
+            tracktime += int(track["LENGTH"])
+
+        return tracktime
+
 
     def get_all_tracks_with(self, attrkey, attrvalue, exattrkey, exattrvalue):
         """Return list of tracks with specified attributes.

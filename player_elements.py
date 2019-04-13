@@ -64,7 +64,7 @@ class Tab:
         self.panes = [pane]
         self.refresh_panes()
         self.populate_lists()
-        self.reset_tab()
+        #self.reset_tab()
 
     def add_to_playlist(self):
         if self.in_add_to_playlist_mode:
