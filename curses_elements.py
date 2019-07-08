@@ -100,6 +100,14 @@ class Status_Bar:
         self.stdscr.attron(curses.color_pair(5))
         status = mpd_get_status()
         state = norm(5, status["state"])
+        state_char = ''
+        if state == "play":
+            state_char = '▶'
+        elif state == "pause":
+            state_char = '⏸'
+        elif state == "stop":
+            state_char = '⏹'
+
         if "elapsed" in status:
             elapsed_time = seconds_to_minutes(round(float(status["elapsed"])))
             duration = seconds_to_minutes(round(float(status["duration"])))
@@ -174,7 +182,7 @@ class List_Pane:
         string_list.append(" ")
         self.pane.erase()
         #scrolling logic, scrolling down. Scroll point set after height - last number should be 1 minus that
-        if (self.vertpos == (self.global_height - self.startscroll)) and (self.selectedpos < (len(string_list) - (self.startscroll - 2))):
+        if (self.vertpos == (self.global_height - self.startscroll)) and (self.selectedpos < (len(string_list) - (self.startscroll - 3))):
             self.scrolloffset += 1
             self.vertpos -= 1
 
@@ -269,43 +277,43 @@ class List_Pane:
     def is_track_pane(self):
         return False
 
-    def skip_down(self, listlength):
-        if self.isActive:
-            if listlength >= (self.scrolloffset + ((self.pane_height - 2) * 2)):
-                self.scrolloffset += self.pane_height - 3
-                if self.vertpos < self.startscroll - 1:
-                    self.vertpos += self.startscroll
-                    self.selectedpos += (self.pane_height - 3) + self.startscroll
-                else:
-                    self.selectedpos += self.pane_height - 3
+#    def skip_down(self, listlength):
+#        if self.isActive:
+#            if listlength >= (self.scrolloffset + ((self.pane_height - 2) * 2)):
+#                self.scrolloffset += self.pane_height - 3
+#                if self.vertpos < self.startscroll - 1:
+#                    self.vertpos += self.startscroll
+#                    self.selectedpos += (self.pane_height - 3) + self.startscroll
+#                else:
+#                    self.selectedpos += self.pane_height - 3
+#
+#            elif not (self.scrolloffset + self.pane_height - 3) == listlength:
+#                old_scrolloffset = self.scrolloffset
+#                self.scrolloffset = listlength - (self.pane_height - 2)
+#                if self.vertpos < self.startscroll - 1:
+#                    self.vertpos += self.startscroll
+#                    self.selectedpos += (self.scrolloffset - old_scrolloffset) + self.startscroll
+#                else:
+#                    self.selectedpos += self.scrolloffset - old_scrolloffset
 
-            elif not (self.scrolloffset + self.pane_height - 3) == listlength:
-                old_scrolloffset = self.scrolloffset
-                self.scrolloffset = listlength - (self.pane_height - 2)
-                if self.vertpos < self.startscroll - 1:
-                    self.vertpos += self.startscroll
-                    self.selectedpos += (self.scrolloffset - old_scrolloffset) + self.startscroll
-                else:
-                    self.selectedpos += self.scrolloffset - old_scrolloffset
-
-    def skip_up(self):
-        if self.isActive:
-            if (self.scrolloffset - self.pane_height - 2) >= 0:
-                self.scrolloffset -= self.pane_height - 3
-                if self.vertpos < self.startscroll - 1:
-                    self.vertpos -= self.startscroll
-                    self.selectedpos -= (self.pane_height - 3) + self.startscroll
-                else:
-                    self.selectedpos -= self.pane_height - 3
-
-            elif not (self.scrolloffset + self.pane_height - 3) == listlength:
-                old_scrolloffset = self.scrolloffset
-                self.scrolloffset = listlength - (self.pane_height - 2)
-                if self.vertpos < self.startscroll - 1:
-                    self.vertpos += self.startscroll
-                    self.selectedpos += (self.scrolloffset - old_scrolloffset) + self.startscroll
-                else:
-                    self.selectedpos += self.scrolloffset - old_scrolloffset
+#    def skip_up(self):
+#        if self.isActive:
+#            if (self.scrolloffset - self.pane_height - 2) >= 0:
+#                self.scrolloffset -= self.pane_height - 3
+#                if self.vertpos < self.startscroll - 1:
+#                    self.vertpos -= self.startscroll
+#                    self.selectedpos -= (self.pane_height - 3) + self.startscroll
+#                else:
+#                    self.selectedpos -= self.pane_height - 3
+#
+#            elif not (self.scrolloffset + self.pane_height - 3) == listlength:
+#                old_scrolloffset = self.scrolloffset
+#                self.scrolloffset = listlength - (self.pane_height - 2)
+#                if self.vertpos < self.startscroll - 1:
+#                    self.vertpos += self.startscroll
+#                    self.selectedpos += (self.scrolloffset - old_scrolloffset) + self.startscroll
+#                else:
+#                    self.selectedpos += self.scrolloffset - old_scrolloffset
 
 class Track_Pane(List_Pane):
     def __init__(self, global_height, global_width, pane_height, pane_width, ypos, xpos, startscroll, stdscr):

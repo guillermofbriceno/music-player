@@ -256,14 +256,20 @@ class Tab:
         if self.isActive:
             for pane, l in zip(self.panes, self.attr_values):
                 if not pane.is_track_pane():
-                    pane.skip_down(len(l))
+                    for i in range(0, 10):
+                        self.move_down()
+                        self.render_all_panes(False)
                 else:
-                    pane.skip_down(len(self.filtered_tracks))
+                    for i in range(0, 10):
+                        self.move_down()
+                        self.render_all_panes(False)
 
     def skip_up_pane(self):
         if self.isActive:
             for pane in self.panes:
-                pane.skip_up()
+                for i in range(0, 10):
+                    self.move_up()
+                    self.render_all_panes(False)
 
     def move_left(self):
         if not self.current_pane == 0 and self.isActive and not self.do_not_overwrite:
