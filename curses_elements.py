@@ -277,44 +277,6 @@ class List_Pane:
     def is_track_pane(self):
         return False
 
-#    def skip_down(self, listlength):
-#        if self.isActive:
-#            if listlength >= (self.scrolloffset + ((self.pane_height - 2) * 2)):
-#                self.scrolloffset += self.pane_height - 3
-#                if self.vertpos < self.startscroll - 1:
-#                    self.vertpos += self.startscroll
-#                    self.selectedpos += (self.pane_height - 3) + self.startscroll
-#                else:
-#                    self.selectedpos += self.pane_height - 3
-#
-#            elif not (self.scrolloffset + self.pane_height - 3) == listlength:
-#                old_scrolloffset = self.scrolloffset
-#                self.scrolloffset = listlength - (self.pane_height - 2)
-#                if self.vertpos < self.startscroll - 1:
-#                    self.vertpos += self.startscroll
-#                    self.selectedpos += (self.scrolloffset - old_scrolloffset) + self.startscroll
-#                else:
-#                    self.selectedpos += self.scrolloffset - old_scrolloffset
-
-#    def skip_up(self):
-#        if self.isActive:
-#            if (self.scrolloffset - self.pane_height - 2) >= 0:
-#                self.scrolloffset -= self.pane_height - 3
-#                if self.vertpos < self.startscroll - 1:
-#                    self.vertpos -= self.startscroll
-#                    self.selectedpos -= (self.pane_height - 3) + self.startscroll
-#                else:
-#                    self.selectedpos -= self.pane_height - 3
-#
-#            elif not (self.scrolloffset + self.pane_height - 3) == listlength:
-#                old_scrolloffset = self.scrolloffset
-#                self.scrolloffset = listlength - (self.pane_height - 2)
-#                if self.vertpos < self.startscroll - 1:
-#                    self.vertpos += self.startscroll
-#                    self.selectedpos += (self.scrolloffset - old_scrolloffset) + self.startscroll
-#                else:
-#                    self.selectedpos += self.scrolloffset - old_scrolloffset
-
 class Track_Pane(List_Pane):
     def __init__(self, global_height, global_width, pane_height, pane_width, ypos, xpos, startscroll, stdscr):
         """Initializes a track pane.
