@@ -97,17 +97,16 @@ class Status_Bar:
             self.bar_string = string
     
     def render_bar(self):
+        char_dict = {
+                'play' : '▶',
+                'pause': '⏸',
+                'stop' : '⏹'
+                }
+
         self.stdscr.attron(curses.color_pair(5))
         status = mpd_get_status()
-        state = norm(5, status["state"])
-        state_char = ''
-        if state == "play":
-            state_char = '▶'
-        elif state == "pause":
-            state_char = '⏸'
-        elif state == "stop":
-            state_char = '⏹'
-
+        state = norm(2, char_dict[status["state"]])
+        
         if "elapsed" in status:
             elapsed_time = seconds_to_minutes(round(float(status["elapsed"])))
             duration = seconds_to_minutes(round(float(status["duration"])))
