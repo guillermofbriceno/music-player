@@ -86,8 +86,8 @@ def member_func(f, obj_list):
         func(obj)
 
 def main():
-    logging.basicConfig(filename='log',level=logging.DEBUG)
-    logging.getLogger("mpd").setLevel(logging.WARNING)
+    #logging.basicConfig(filename='log',level=logging.DEBUG)
+    #logging.getLogger("mpd").setLevel(logging.WARNING)
     os.environ.setdefault('ESCDELAY', '25')
     curses.wrapper(start_player)
     #database = start_database(db_dir, playlists_dir)

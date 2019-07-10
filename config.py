@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 import curses
 
 #Database directory. Must match MPD music directories (multiple dirs not supported by MPD anyway)
