@@ -68,11 +68,18 @@ tabs_config = [
                 'pane-titles': ["Genre", "Album", None]
             },
             {
+                'tab-type': "2-PANE",
+                'include-only': [None, None],
+                'exclude': ["COMPOSER", ["Bach"]],
+                'filter-keys': ["ALBUM", "TRACK"],
+                'pane-titles': ["Album", None]
+            },
+            {
                 'tab-type': "3-PANE",
                 'include-only': ["PLAYLISTS", None],
                 'exclude': [None, None],
-                'filter-keys': ["PLAYLIST", "GENRE", "TRACK"],
-                'pane-titles': ["Playlist", "Genre", None]
+                'filter-keys': ["PLAYLIST", "ALBUM", "TRACK"],
+                'pane-titles': ["Playlist", "Album/Work", None]
             }
         ]
 

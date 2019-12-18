@@ -92,13 +92,13 @@ class Tab:
                 self.exclude_filter[0], self.exclude_filter[1])
 
         pane1 = List_Pane(self.window_dims[0], self.window_dims[1], #main window dims
-                self.window_dims[0] - self.height_offset, 30, #height and width of pane
+                self.window_dims[0] - self.height_offset, 60, #height and width of pane
                 0, 0, #y and x position of top left corner of pane
                 self.scrll_start, self.stdscr, self.pane_titles[0])
 
         pane2 = Track_Pane(self.window_dims[0], self.window_dims[1], 
-                self.window_dims[0] - 1, self.window_dims[1] - 29, 
-                0, 29, 
+                self.window_dims[0] - 1, self.window_dims[1] - 59, 
+                0, 59, 
                 self.scrll_start, self.stdscr)
 
         pane1.activate()

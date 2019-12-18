@@ -137,7 +137,7 @@ class Database:
         tracks_to_remove = get_tracks_with(self.dict_list, "PATH", path_list)
         for track in tracks_to_remove:
             for path in path_list: # in case get_tracks_with found substrings that we didn't want removed like matching pieces of directories 
-                if track["PATH"] == path:
+                if path in track["PATH"]:
                     self.dict_list.remove(track)
 
         dump_database(self)
@@ -146,8 +146,10 @@ class Database:
         mask = r'**/*.[mf][pl][3a]*'
         pathlist_gen = Path(folder_directory).glob(mask)
         tracklist = []
+        pathlist = []
         for path in pathlist_gen:
             tmp_tagdict = create_track(path, db_dir[0])
+            pathlist.append(tmp_tagdict["PATH"])
             tracklist.append(tmp_tagdict)
 
         if len(get_tracks_with(self.dict_list, "PATH", [tracklist[0]["PATH"]])) > 0:
@@ -158,6 +160,12 @@ class Database:
                 self.dict_list.append(track)
 
             self.sort_tracks("NORMAL")
+
+            with open(install_dir + "/playlists/Recently Added.m3u",'a+') as recentfile:
+                for track in self.dict_list:
+                    if track["PATH"] in pathlist:
+                        recentfile.write(track["PATH"] + '\n')
+
             return True
 
     def update_tracks_from_dir(self, folder_directory):

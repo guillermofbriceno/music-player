@@ -339,7 +339,18 @@ class Track_Pane(List_Pane):
             else:
                 tracktime = " "
 
-            space = (4 - len(tracknum)) * " "    
+            if trackpath in selected_track_paths:
+                space = (5 - len(tracknum)) * " "    
+                if trackIsNowPlaying:
+                    space = space[2:]
+                    space += "▶ "
+                space += "*"
+            elif trackIsNowPlaying and len(trackpath) != 1:
+                space = (2 - len(tracknum)) * " "    
+                space += "▶ "
+            else:
+                space = (4 - len(tracknum)) * " "    
+
             title = tracknum + space + title
 
             if len(title) >= self.pane_width - 9:
