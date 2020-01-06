@@ -374,8 +374,9 @@ class Tab:
                     #subprocess.call(["mpc", "add", track["PATH"]], stdout=subprocess.PIPE)
                     client.add(track["PATH"])
 
-                subprocess.call(["mpc", "play", 
-                    str(self.panes[len(self.panes) - 1].selectedpos + 1)], stdout=subprocess.PIPE)
+                #subprocess.call(["mpc", "play", 
+                #    str(self.panes[len(self.panes) - 1].selectedpos + 1)], stdout=subprocess.PIPE)
+                client.play(self.panes[len(self.panes) - 1].selectedpos)
             except CommandError as e:
                 height, width = self.stdscr.getmaxyx()
                 self.status_bar.set_bar_string("MPD Error: " + str(e))
