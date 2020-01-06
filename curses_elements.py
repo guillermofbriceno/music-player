@@ -188,8 +188,14 @@ class List_Pane:
             self.scrolloffset -= 1
             self.vertpos += 1
 
+        current_playing_song = mpd_get_current_playing()
+
+
         for string in string_list:
+            is_string_current_playing = string in current_playing_song.values()
             string = str(string_list[i + self.scrolloffset])
+            if is_string_current_playing:
+                string = "▶ " + string
 
             if len(string) + 2 >= self.pane_width:
                 string = string[:-(len(string) - self.pane_width + 4)]
@@ -198,8 +204,13 @@ class List_Pane:
                 self.pane.attron(curses.color_pair(3))
                 self.pane.addstr(i + 1, len(string), " " * (self.pane_width - len(string) - 1))
             else:
-                self.pane.attron(curses.color_pair(2))
-                self.pane.addstr(i + 1, len(string), " " * (self.pane_width - len(string) - 1))
+                if not is_string_current_playing:
+                    self.pane.attron(curses.color_pair(2))
+                    self.pane.addstr(i + 1, len(string), " " * (self.pane_width - len(string) - 1))
+                else:
+                    self.pane.attron(curses.color_pair(6))
+                    self.pane.addstr(i + 1, len(string), " " * (self.pane_width - len(string) - 1))
+
             self.pane.addstr(i + 1, 1, string)
             i += 1
             
