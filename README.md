@@ -10,13 +10,13 @@ Up to 9 'tabs' can be configured, each with a different combination and collecti
 
 Examples of different layouts and tag organizations:
 
-![Alt text](https://emptytincan.com/r/wvn06   "Genre->Album->Performer->Track")
+![Alt text](https://emptytincan.com/r/wvn06 "Genre->Album->Performer->Track")
 Genre -> Album -> Performer -> Track. Custom pane titles can be set, here the 'Album' pane is set to 'Work.'
 
-![Alt text](https://emptytincan.com/r/80xwh"Single pane with tracks")
+![Alt text](https://emptytincan.com/r/80xwh "Single pane with tracks")
 Just a single pane with tracks. Each tab can be configured with include and exclude tags, in this example only tracks with the "Composer" tag matching "Bach" are allowed to be displayed in the tab.
 
-![Alt text](https://emptytincan.com/r/80xwh"Genre->Album->Track")
+![Alt text](https://emptytincan.com/r/80xwh "Genre->Album->Track")
 A more conventional three-pane layout, this time specifying an exclude with "Composer" "Bach." Excludes and includes can be mixed, and each can support more than one field and tag value.
 
 # Todo
