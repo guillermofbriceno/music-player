@@ -16,7 +16,7 @@ Genre -> Album -> Performer -> Track. Custom pane titles can be set, here the 'A
 ![Alt text](https://emptytincan.com/r/80xwh "Single pane with tracks")
 Just a single pane with tracks. Each tab can be configured with include and exclude tags, in this example only tracks with the "Composer" tag matching "Bach" are allowed to be displayed in the tab.
 
-![Alt text](https://emptytincan.com/r/80xwh "Genre->Album->Track")
+![Alt text](https://www.emptytincan.com/i/g/1578291613-p8VzS.png "Genre->Album->Track")
 A more conventional three-pane layout, this time specifying an exclude with "Composer" "Bach." Excludes and includes can be mixed, and each can support more than one field and tag value.
 
 # Todo
