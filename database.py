@@ -56,7 +56,6 @@ def get_unique_attributes(dict_list, attr):
 
     return tmp_list
 
-
 def get_tracks_with(dict_list, attrkey, attrvalue):
         """Return list of tracks with specified attributes.
         Args:
@@ -97,25 +96,6 @@ def cut_brackets(tag):
         string = string[:-2]
         return string
 
-def create_track(path, dir_str):
-    track = taglib.File(path)
-    #Read the dict from taglib by removing the brackets from the values
-    tmp_tagdict = {k: cut_brackets(tag) for k, tag in track.tags.items()}
-    #Add length and path to the track dictionary. Absolute path cut MPC prep
-    tmp_tagdict["PATH"] = str(path)[len(dir_str) + 1:]
-    tmp_tagdict["LENGTH"] = track.length
-    #Handle weird tracknumber cases for sorting methods
-    tracknum_tmp = tmp_tagdict["TRACKNUMBER"]
-    if '/' in tracknum_tmp:
-        tmp_tagdict["TRACKNUMBER"] = tracknum_tmp[:-tracknum_tmp.rfind("/") - 1]
-    elif tracknum_tmp.isdigit():
-        pass
-    else:
-        tmp_tagdict["TRACKNUMBER"] = "0"
-
-    return tmp_tagdict
-
-
 class Database:
     """A representation of the entire music library.
     Args:
@@ -152,62 +132,6 @@ class Database:
 
                 self.dict_list.append(dictionary)
 
-    def delete_tracks_from_database(self, path_list):
-        tracks_to_remove = get_tracks_with(self.dict_list, "PATH", path_list)
-        for track in tracks_to_remove:
-            for path in path_list: # in case get_tracks_with found substrings that we didn't want removed like matching pieces of directories 
-                if path in track["PATH"]:
-                    self.dict_list.remove(track)
-
-        dump_database(self)
-
-    def add_tracks_from_dir(self, folder_directory):
-        mask = r'**/*.[mf][pl][3a]*'
-        pathlist_gen = Path(folder_directory).glob(mask)
-        tracklist = []
-        pathlist = []
-        for path in pathlist_gen:
-            tmp_tagdict = create_track(path, db_dir[0])
-            pathlist.append(tmp_tagdict["PATH"])
-            tracklist.append(tmp_tagdict)
-
-        if len(get_tracks_with(self.dict_list, "PATH", [tracklist[0]["PATH"]])) > 0:
-            print("Tracks already exist in database.")
-            return False
-        else:
-            for track in tracklist:
-                self.dict_list.append(track)
-
-            self.sort_tracks("NORMAL")
-
-            with open(install_dir + "/playlists/Recently Added.m3u",'a+') as recentfile:
-                for track in self.dict_list:
-                    if track["PATH"] in pathlist:
-                        recentfile.write(track["PATH"] + '\n')
-
-            return True
-
-    def update_tracks_from_dir(self, folder_directory):
-        mask = r'**/*.[mf][pl][3a]*'
-        pathlist_gen = Path(folder_directory).glob(mask)
-        tracklist = []
-        for path in pathlist_gen:
-            tmp_tagdict = create_track(path, db_dir[0])
-            tracklist.append(tmp_tagdict)
-
-        full_sample_track_path = tracklist[0]["PATH"]
-        index = full_sample_track_path.rfind('/')
-        no_track_path = full_sample_track_path[:-(len(full_sample_track_path) - index)]
-        tracks_to_remove = get_tracks_with(self.dict_list, "PATH", [no_track_path])
-        for track in tracks_to_remove:
-            self.dict_list.remove(track)
-
-        for track in tracklist:
-            print("Updating: ", track["PATH"])
-            self.dict_list.append(track)
-
-        self.sort_tracks("NORMAL")
-
     def sort_tracks(self, method):
         if method == "NORMAL":
             normal_sort(self.dict_list)
@@ -230,7 +154,6 @@ class Database:
             tracktime += int(track["LENGTH"])
 
         return tracktime
-
 
     def get_all_tracks_with(self, attrkey, attrvalue, exattrkey, exattrvalue):
         """Return list of tracks with specified attributes.
