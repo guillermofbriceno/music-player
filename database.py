@@ -7,7 +7,15 @@ from functools import reduce
 import re
 from config import *
 import logging
+from mpd import MPDClient, MPDError, CommandError
 
+def start_mpd_client():
+    client = MPDClient()
+    client.timeout = 10
+    client.idletimeout = None
+    client.connect("localhost", 6600)
+    return client
+ 
 def tryint(s):
     try:
         return int(s)
@@ -18,7 +26,7 @@ def alphanum_key(track):
     """ Turn a string into a list of string and number chunks.
         "z23a" -> ["z", 23, "a"]
     """
-    return [ tryint(c) for c in re.split('([0-9]+)',  track["ALBUM"] + track["TRACKNUMBER"])]
+    return [ tryint(c) for c in re.split('([0-9]+)',  track["album"] + track["TRACKNUMBER"])]
 
 def normal_sort(l):
     """ Sort the given list in the way that humans expect.
@@ -37,9 +45,17 @@ def get_unique_attributes(dict_list, attr):
 
     seen = set()
     seen_add = seen.add
-    return [x[attr] for x in dict_list 
-            if attr in x 
-            if not (x[attr] in seen or seen_add(x[attr]))]
+    tmp_list = []
+    for x in dict_list:
+        if attr in x:
+            if type(x[attr]) is list:
+                string = "+"
+                x[attr] = string.join(x[attr])
+            if not (x[attr] in seen or seen_add(x[attr])):
+                tmp_list.append(x[attr])
+
+    return tmp_list
+
 
 def get_tracks_with(dict_list, attrkey, attrvalue):
         """Return list of tracks with specified attributes.
@@ -62,21 +78,10 @@ def dump_database(database):
     pickle.dump(database, db_file)
 
 def start_database(directory_strs, playlists_dir):
-    database_name = directory_strs[0][directory_strs[0].rfind("/") + 1:] + "-db"
-    if database_file_already_exists(database_name):
-        db_file = open(install_dir + "/" + database_name, 'rb')
-        database = pickle.load(db_file)
-        playlists = Playlists(playlists_dir, directory_strs, database)
-        database.add_playlists(playlists)
-        return database
-    else:
-        print("Database file not found, creating one...")
-        database = Database(directory_strs)
-        db_file = open(install_dir + "/" + database_name, 'wb')
-        pickle.dump(database, db_file)
-        playlists = Playlists(playlists_dir, directory_strs, database)
-        database.add_playlists(playlists)
-        return database
+    database = Database(directory_strs)
+    playlists = Playlists(playlists_dir, directory_strs, database)
+    database.add_playlists(playlists)
+    return database
 
 def database_file_already_exists(file_name):
     """Check if database file exists in the running/database directory.
@@ -123,15 +128,29 @@ class Database:
         self.sort_tracks("NORMAL")
 
     def generate_database(self, directory_strs):
-        mask = r'**/*.[mf][pl][3a]*'
-        
         print("Generating database...\n")
+        client = start_mpd_client()
+        mpd_db = client.listallinfo()
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
 
-        for dir_str in directory_strs:
-            pathlist_gen = Path(dir_str).glob(mask)
-            for path in pathlist_gen:
-                tmp_tagdict = create_track(path, dir_str)
-                self.dict_list.append(tmp_tagdict)
+        for dictionary in mpd_db:
+            if "file" in dictionary.keys():
+                dictionary["PATH"] = dictionary.pop("file")
+                dictionary["LENGTH"] = dictionary.pop("time")
+                dictionary["TRACKNUMBER"] = dictionary.pop("track")
+                if type(dictionary["TRACKNUMBER"]) is list:
+                    dictionary["TRACKNUMBER"] = dictionary["TRACKNUMBER"][0]
+                tracknum_tmp = dictionary["TRACKNUMBER"]
+
+                if '/' in tracknum_tmp:
+                    dictionary["TRACKNUMBER"] = tracknum_tmp[:-tracknum_tmp.rfind("/") - 1]
+                elif tracknum_tmp.isdigit():
+                    pass
+                else:
+                    dictionary["TRACKNUMBER"] = "0"
+
+                self.dict_list.append(dictionary)
 
     def delete_tracks_from_database(self, path_list):
         tracks_to_remove = get_tracks_with(self.dict_list, "PATH", path_list)

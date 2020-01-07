@@ -36,49 +36,49 @@ ui_config = {
 tabs_config = [
             {
                 'tab-type': "SINGLE",
-                'include-only': ["COMPOSER", ["Bach"]],
+                'include-only': ["composer", ["Bach"]],
                 'exclude': [None, None]
             },
             {
                 'tab-type': "4-PANE",
-                'include-only': ["COMPOSER", ["Bach"]],
+                'include-only': ["composer", ["Bach"]],
                 'exclude': [None, None],
-                'filter-keys': ["GENRE", "ALBUM", "PERFORMER", "TRACK"],
+                'filter-keys': ["genre", "album", "performer", "TRACK"],
                 'pane-titles': ["Genre", "Work", "Performer", None]
             },
             {
                 'tab-type': "3-PANE",
-                'include-only': ["COMPOSER", ["Bach"]],
+                'include-only': ["composer", ["Bach"]],
                 'exclude': [None, None],
-                'filter-keys': ["PERFORMER", "ALBUM", "TRACK"],
+                'filter-keys': ["performer", "album", "TRACK"],
                 'pane-titles': ["Performer", "Work", None]
             },
             {
                 'tab-type': "3-PANE",
                 'include-only': [None, None],
-                'exclude': ["COMPOSER", ["Bach"]],
-                'filter-keys': ["ARTIST", "ALBUM", "TRACK"],
+                'exclude': ["composer", ["Bach"]],
+                'filter-keys': ["artist", "album", "TRACK"],
                 'pane-titles': ["Artist", "Album", None]
             },
             {
                 'tab-type': "3-PANE",
                 'include-only': [None, None],
-                'exclude': ["COMPOSER", ["Bach"]],
-                'filter-keys': ["GENRE", "ALBUM", "TRACK"],
+                'exclude': ["composer", ["Bach"]],
+                'filter-keys': ["genre", "album", "TRACK"],
                 'pane-titles': ["Genre", "Album", None]
             },
             {
                 'tab-type': "2-PANE",
                 'include-only': [None, None],
-                'exclude': ["COMPOSER", ["Bach"]],
-                'filter-keys': ["ALBUM", "TRACK"],
+                'exclude': ["composer", ["Bach"]],
+                'filter-keys': ["album", "TRACK"],
                 'pane-titles': ["Album", None]
             },
             {
                 'tab-type': "3-PANE",
                 'include-only': ["PLAYLISTS", None],
                 'exclude': [None, None],
-                'filter-keys': ["PLAYLIST", "ALBUM", "TRACK"],
+                'filter-keys': ["PLAYLIST", "album", "TRACK"],
                 'pane-titles': ["Playlist", "Album/Work", None]
             }
         ]

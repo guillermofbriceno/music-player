@@ -192,8 +192,8 @@ class List_Pane:
 
 
         for string in string_list:
-            is_string_current_playing = string in current_playing_song.values()
             string = str(string_list[i + self.scrolloffset])
+            is_string_current_playing = string in current_playing_song.values()
             if is_string_current_playing:
                 string = "▶ " + string
 
@@ -320,7 +320,7 @@ class Track_Pane(List_Pane):
         self.pane.refresh()
 
     def render(self, track_dicts, selected_track_paths):
-        empty_dict = {  "TITLE":" ",
+        empty_dict = {  "title":" ",
                         "PATH": " ",
                         "TRACKNUMBER": " ",
                         "LENGTH": " "
@@ -338,7 +338,7 @@ class Track_Pane(List_Pane):
             self.vertpos += 1
 
         for track in track_dicts:
-            title = track_dicts[i + self.scrolloffset]["TITLE"]
+            title = track_dicts[i + self.scrolloffset]["title"]
             trackpath = track_dicts[i + self.scrolloffset]["PATH"]
             tracknum = track_dicts[i + self.scrolloffset]["TRACKNUMBER"]
             tracklength = track_dicts[i + self.scrolloffset]["LENGTH"]
