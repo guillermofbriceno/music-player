@@ -1,4 +1,5 @@
 import curses
+from datetime import date, timedelta
 
 #Database directory. Must match MPD music directories (multiple dirs not supported by MPD anyway)
 db_dir = ["/home/guillermo/bach/Music/all-music"]
@@ -8,6 +9,9 @@ install_dir = "/home/guillermo/programming/music-player"
 
 #Keybindings
 number_keys = [ord(str(num)) for num in range(9)]
+
+#recent days
+dates = [str(date.today() - timedelta(days=i)) for i in range(20)]
 
 mvmt_keys = {
             'j': 'move_down',
@@ -80,6 +84,13 @@ tabs_config = [
                 'exclude': [None, None],
                 'filter-keys': ["PLAYLIST", "album", "TRACK"],
                 'pane-titles': ["Playlist", "Album/Work", None]
+            },
+            {
+                'tab-type': "2-PANE",
+                'include-only': ["last-modified", dates],
+                'exclude': [None, None],
+                'filter-keys': ["album", "TRACK"],
+                'pane-titles': ["Album/Work", None]
             }
         ]
 

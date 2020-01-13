@@ -6,7 +6,6 @@ from fractions import Fraction
 from functools import reduce
 import re
 from config import *
-import logging
 from mpd import MPDClient, MPDError, CommandError
 
 def start_mpd_client():
@@ -212,6 +211,9 @@ class Playlists:
         self.populate_playlist_tracks(playlists_dir, dir_strs)
 
     def populate_playlist_tracks(self, playlist_dir, dir_strs):
+        logger = logging.getLogger(__file__)
+        hdlr = logging.FileHandler(__file__ + ".log")
+        logger.setLevel(logging.DEBUG)
         pathlist_gen = Path(playlist_dir).glob('*.m3u')
         for path in pathlist_gen:
             with open(path) as playlist:
@@ -220,7 +222,11 @@ class Playlists:
                 for track_path in playlist:
                     if not track_path == '\n':
                         track_path = track_path.rstrip("\n\r")
-                        logging.debug(track_path)
-                        tmp_tagdict = next(track for track in self.database.dict_list if track["PATH"] == track_path)
+                        for track in self.database.dict_list:
+                            if track["PATH"] == track_path:
+                                tmp_tagdict = track
+                        else:
+                            continue
+                        #tmp_tagdict = next(track for track in self.database.dict_list if track["PATH"] == track_path)
                         tmp_tagdict["PLAYLIST"] = playlist_file_name
                         self.playlist_dict_list.append(tmp_tagdict.copy())
